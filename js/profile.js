@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileSidebar = document.querySelector('.profile-sidebar');
     
     // Current user data
-let currentUser = null;
-let userData = null;
+    let currentUser = null;
+    let userData = null;
     let isEditing = false;
     
     // Show shimmer effects immediately on page load
@@ -18,30 +18,76 @@ let userData = null;
     
     // Check if user is logged in
     auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUser = user;
-            await loadUserData();
+        try {
+            console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+            
+            if (user) {
+                currentUser = user;
+                await loadUserData(); // Load user data from Firestore
+                console.log('User data loaded:', userData);
+            } else {
+                // For demo purposes, load a demo profile
+                await loadDemoUserData();
+                console.log('Demo data loaded:', userData);
+            }
+            
+            if (!userData) {
+                console.warn('userData is null after loading, using default data');
+                userData = getDefaultUserData();
+            }
+            
+            // Make sure userData has a uid property
+            if (currentUser && !userData.uid) {
+                userData.uid = currentUser.uid;
+            }
+            
+            // Get profile username from URL if available
+            const urlParams = new URLSearchParams(window.location.search);
+            const profileUsername = urlParams.get('username');
+            
+            // If there's a username in the URL and it's not the current user, load that profile
+            if (profileUsername && currentUser && profileUsername !== userData.username) {
+                try {
+                    const profileUserQuery = await db.collection('users')
+                        .where('username', '==', profileUsername)
+                        .limit(1)
+                        .get();
+                    
+                    if (!profileUserQuery.empty) {
+                        userData = profileUserQuery.docs[0].data();
+                        userData.uid = profileUserQuery.docs[0].id; // Set the document ID as the uid
+                        console.log('Loaded profile for:', profileUsername);
+                    }
+                } catch (error) {
+                    console.error('Error loading profile from URL param:', error);
+                }
+            }
+            
+            // Render profile and hide shimmer AFTER data is loaded
             renderUserProfile();
             setupTabNavigation();
-            hideProfileShimmer(); // Hide shimmer after loading
-        } else {
-            // For demo purposes, we'll still load a demo profile
-            await loadDemoUserData();
+        } catch (error) {
+            console.error('Error in auth state change handler:', error);
+            userData = getDefaultUserData();
             renderUserProfile();
             setupTabNavigation();
-            hideProfileShimmer(); // Hide shimmer after loading
         }
     });
     
     // Load user data from Firestore
     async function loadUserData() {
         try {
-            if (!currentUser) return;
+            if (!currentUser) {
+                console.warn('Cannot load user data: No current user');
+                return;
+            }
             
+            console.log('Loading user data for:', currentUser.uid);
             const userDoc = await db.collection('users').doc(currentUser.uid).get();
             
             if (userDoc.exists) {
                 userData = userDoc.data();
+                userData.uid = currentUser.uid; // Ensure UID is set
                 
                 // Ensure photoURL is synced from auth profile
                 if (currentUser.photoURL && (!userData.photoURL || userData.photoURL !== currentUser.photoURL)) {
@@ -56,21 +102,76 @@ let userData = null;
                         console.warn('Could not update photoURL in Firestore:', updateError);
                     }
                 }
+                
+                // Ensure required fields exist
+                userData.displayName = userData.displayName || currentUser.displayName || 'User';
+                userData.avatarUrl = userData.avatarUrl || userData.photoURL || currentUser.photoURL || 'img/default-profile.png';
+                userData.bio = userData.bio || 'No bio available';
+                userData.stats = userData.stats || {
+                    discussions: 0,
+                    reputation: 0,
+                    comments: 0,
+                    joined: formatJoinDate(currentUser.metadata?.creationTime)
+                };
+                
+                console.log('User data loaded successfully with UID:', userData.uid);
             } else {
-                console.log('No user data found');
+                console.warn('No user document found in Firestore, creating default profile');
                 userData = getDefaultUserData();
-                // Add auth user's photoURL if available
+                userData.uid = currentUser.uid;
+                
+                // Add auth user's displayName and photoURL if available
+                if (currentUser.displayName) {
+                    userData.displayName = currentUser.displayName;
+                }
                 if (currentUser.photoURL) {
                     userData.photoURL = currentUser.photoURL;
+                    userData.avatarUrl = currentUser.photoURL;
+                }
+                
+                // Set join date from Firebase Auth
+                if (currentUser.metadata?.creationTime) {
+                    userData.stats.joined = formatJoinDate(currentUser.metadata.creationTime);
+                }
+                
+                // Create a new user document in Firestore
+                try {
+                    await db.collection('users').doc(currentUser.uid).set(userData);
+                    console.log('Created new user document in Firestore');
+                } catch (createError) {
+                    console.error('Failed to create user document:', createError);
                 }
             }
         } catch (error) {
             console.error('Error loading user data:', error);
             userData = getDefaultUserData();
-            // Add auth user's photoURL if available
-            if (currentUser && currentUser.photoURL) {
-                userData.photoURL = currentUser.photoURL;
+            
+            // Add auth user's info if available
+            if (currentUser) {
+                userData.uid = currentUser.uid;
+                if (currentUser.displayName) {
+                    userData.displayName = currentUser.displayName;
+                }
+                if (currentUser.photoURL) {
+                    userData.photoURL = currentUser.photoURL;
+                    userData.avatarUrl = currentUser.photoURL;
+                }
             }
+        }
+    }
+    
+    // Format join date from timestamp
+    function formatJoinDate(timestamp) {
+        if (!timestamp) return '';
+        
+        try {
+            const date = new Date(timestamp);
+            const month = date.toLocaleString('default', { month: 'short' });
+            const year = date.getFullYear();
+            return `${month} ${year}`;
+        } catch (error) {
+            console.error('Error formatting join date:', error);
+            return '';
         }
     }
     
@@ -249,11 +350,51 @@ let userData = null;
             
             const joinedStat = document.querySelector('.profile-stat:nth-child(4) .stat-value');
             if (joinedStat) {
-                joinedStat.textContent = userData.stats.joined || 'N/A';
+                joinedStat.textContent = userData.stats.joined || '';
+            }
+        }
+
+        // Handle profile actions - hide follow and message buttons for own profile
+        const profileActions = document.querySelector('.profile-actions');
+        const followBtn = profileActions?.querySelector('.follow-btn');
+        const messageBtn = profileActions?.querySelector('.message-btn');
+        
+        if (profileActions) {
+            // Check if user is viewing their own profile
+            const isOwnProfile = currentUser && userData && currentUser.uid === userData.uid;
+            console.log('Profile ownership check:', { 
+                currentUserUID: currentUser ? currentUser.uid : 'no-user',
+                profileUID: userData ? userData.uid : 'no-profile-data',
+                isOwnProfile
+            });
+            
+            if (isOwnProfile) {
+                // Viewing own profile - hide follow and message buttons
+                if (followBtn) followBtn.style.display = 'none';
+                if (messageBtn) messageBtn.style.display = 'none';
+                
+                // Add edit button if it doesn't already exist
+                if (!profileActions.querySelector('.edit-profile-header-btn')) {
+                    const editProfileBtn = document.createElement('button');
+                    editProfileBtn.className = 'edit-profile-header-btn';
+                    editProfileBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Profile';
+                    editProfileBtn.addEventListener('click', startEditing);
+                    profileActions.prepend(editProfileBtn);
+                }
+            } else {
+                // Viewing someone else's profile - show follow and message buttons
+                if (followBtn) followBtn.style.display = 'inline-flex';
+                if (messageBtn) messageBtn.style.display = 'inline-flex';
+                
+                // Remove edit button if it exists
+                const editBtn = profileActions.querySelector('.edit-profile-header-btn');
+                if (editBtn) {
+                    editBtn.remove();
+                }
             }
         }
         
-        // Render sidebar information
+        // Render sidebar with user data
         renderSidebar();
         
         // Render About tab content
@@ -267,6 +408,9 @@ let userData = null;
         
         // Setup image upload functionality
         setupImageUpload();
+        
+        // Hide shimmer and show content
+        hideProfileShimmer();
     }
     
     // Render user sidebar information
@@ -643,28 +787,73 @@ let userData = null;
         const section = e.target.dataset.section || 'header';
         isEditing = true;
         
+        // Store original values for comparison
+        window.originalProfileValues = window.originalProfileValues || {};
+        
         if (section === 'header') {
             // Enable editing of header elements
             const nameElement = document.querySelector('.profile-name');
             const bioElement = document.querySelector('.profile-bio');
             
+            // Store original values
+            window.originalProfileValues.displayName = userData.displayName;
+            window.originalProfileValues.bio = userData.bio;
+            
             // Replace with editable fields
             nameElement.innerHTML = `<input type="text" id="edit-name" value="${userData.displayName}">`;
             bioElement.innerHTML = `<textarea id="edit-bio">${userData.bio}</textarea>`;
             
+            // Add input change listeners to toggle save button visibility
+            const nameInput = document.getElementById('edit-name');
+            const bioInput = document.getElementById('edit-bio');
+            
             // Change button to Save
             e.target.textContent = 'Save Profile';
+            e.target.classList.add('disabled-btn');
+            e.target.style.opacity = '0.6';
+            e.target.style.cursor = 'default';
             e.target.removeEventListener('click', startEditing);
             e.target.addEventListener('click', () => saveChanges({ target: { dataset: { section: 'header' } } }));
+            
+            // Add event listeners to detect changes
+            function checkForChanges() {
+                const displayNameChanged = nameInput.value !== window.originalProfileValues.displayName;
+                const bioChanged = bioInput.value !== window.originalProfileValues.bio;
+                
+                if (displayNameChanged || bioChanged) {
+                    e.target.classList.remove('disabled-btn');
+                    e.target.style.opacity = '1';
+                    e.target.style.cursor = 'pointer';
+                } else {
+                    e.target.classList.add('disabled-btn');
+                    e.target.style.opacity = '0.6';
+                    e.target.style.cursor = 'default';
+                }
+            }
+            
+            nameInput.addEventListener('input', checkForChanges);
+            bioInput.addEventListener('input', checkForChanges);
+            
         } else {
             // Enable editing for other sections
             const sectionElement = document.querySelector('.about-user-section, .profile-topics-section');
             if (sectionElement) {
+                // Store original values
+                window.originalProfileValues[section] = {};
+                
                 const fields = sectionElement.querySelectorAll('.about-field');
                 fields.forEach(field => {
                     const valueEl = field.querySelector('.field-value');
                     const editEl = field.querySelector('.edit-field');
                     if (valueEl && editEl) {
+                        const fieldInputs = editEl.querySelectorAll('[data-field]');
+                        
+                        // Store original values for each field
+                        fieldInputs.forEach(input => {
+                            const fieldName = input.dataset.field;
+                            window.originalProfileValues[section][fieldName] = input.value;
+                        });
+                        
                         valueEl.style.display = 'none';
                         editEl.style.display = 'block';
                     }
@@ -677,6 +866,42 @@ let userData = null;
                     editBtn.style.display = 'none';
                     actions.style.display = 'flex';
                 }
+                
+                // Disable the save button initially
+                const saveBtn = actions.querySelector('.save-profile-btn');
+                saveBtn.classList.add('disabled-btn');
+                saveBtn.style.opacity = '0.6';
+                saveBtn.style.cursor = 'default';
+                
+                // Add change event listeners to all inputs
+                const inputs = sectionElement.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    const fieldName = input.dataset.field;
+                    if (fieldName) {
+                        input.addEventListener('input', () => {
+                            let hasChanges = false;
+                            
+                            // Check all inputs for changes
+                            inputs.forEach(inp => {
+                                const field = inp.dataset.field;
+                                if (field && window.originalProfileValues[section][field] !== inp.value) {
+                                    hasChanges = true;
+                                }
+                            });
+                            
+                            // Enable/disable save button based on changes
+                            if (hasChanges) {
+                                saveBtn.classList.remove('disabled-btn');
+                                saveBtn.style.opacity = '1';
+                                saveBtn.style.cursor = 'pointer';
+                            } else {
+                                saveBtn.classList.add('disabled-btn');
+                                saveBtn.style.opacity = '0.6';
+                                saveBtn.style.cursor = 'default';
+                            }
+                        });
+                    }
+                });
             }
         }
     }
@@ -685,7 +910,17 @@ let userData = null;
     async function saveChanges(e) {
         const section = e.target.dataset.section || 'header';
         
+        // Check if the button is disabled (no changes to save)
+        if (e.target.classList.contains('disabled-btn')) {
+            return;
+        }
+        
         try {
+            // Show loading state
+            const originalText = e.target.innerHTML;
+            e.target.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            e.target.disabled = true;
+            
             // Collect the edited data
             let updates = {};
             
@@ -704,6 +939,7 @@ let userData = null;
                 document.querySelector('.profile-bio').textContent = newBio;
                 
                 // Change button back
+                e.target.innerHTML = originalText;
                 e.target.textContent = 'Edit Profile';
                 e.target.removeEventListener('click', saveChanges);
                 e.target.addEventListener('click', startEditing);
@@ -713,11 +949,11 @@ let userData = null;
                 const editFields = document.querySelectorAll('.edit-field input, .edit-field textarea');
                 editFields.forEach(field => {
                     const fieldName = field.dataset.field;
-                    if (fieldName.includes('.')) {
+                    if (fieldName?.includes('.')) {
                         const [parent, child] = fieldName.split('.');
                         if (!updates[parent]) updates[parent] = {};
                         updates[parent][child] = field.value;
-                    } else {
+                    } else if (fieldName) {
                         updates[fieldName] = field.value;
                     }
                 });
@@ -736,7 +972,7 @@ let userData = null;
                                 valueEl.innerHTML = `<a href="https://${fieldInput.value}" target="_blank">${fieldInput.value}</a>`;
                             } else if (fieldInput.dataset.field === 'education.degree') {
                                 const institution = editEl.querySelector('[data-field="education.institution"]');
-                                valueEl.innerHTML = `${fieldInput.value}<br>${institution.value}`;
+                                valueEl.innerHTML = `${fieldInput.value}<br>${institution ? institution.value : ''}`;
                             } else if (fieldInput.dataset.field !== 'education.institution') {
                                 valueEl.textContent = fieldInput.value;
                             }
@@ -759,10 +995,11 @@ let userData = null;
             // Update the local userData object
             Object.keys(updates).forEach(key => {
                 if (typeof updates[key] === 'object') {
+                    if (!userData[key]) userData[key] = {};
                     Object.keys(updates[key]).forEach(subKey => {
                         userData[key][subKey] = updates[key][subKey];
                     });
-        } else {
+                } else {
                     userData[key] = updates[key];
                 }
             });
@@ -770,14 +1007,22 @@ let userData = null;
             // If user is logged in, save to Firebase
             if (currentUser) {
                 await db.collection('users').doc(currentUser.uid).update(updates);
+                showNotification('Profile updated successfully', 'success');
                 console.log('Profile updated successfully');
             } else {
+                showNotification('Profile would be updated if logged in', 'info');
                 console.log('Profile would be updated if logged in');
             }
         
-    } catch (error) {
-        console.error('Error updating profile:', error);
-            alert('Failed to update profile. Please try again.');
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            showNotification('Failed to update profile. Please try again.', 'error');
+        } finally {
+            // Reset disabled state
+            e.target.disabled = false;
+            
+            // Clear stored original values
+            delete window.originalProfileValues;
         }
         
         isEditing = false;
@@ -798,7 +1043,7 @@ let userData = null;
             editBtn.textContent = 'Edit Profile';
             editBtn.removeEventListener('click', saveChanges);
             editBtn.addEventListener('click', startEditing);
-    } else {
+        } else {
             // Hide edit fields, show values for a section
             const sectionElement = document.querySelector('.about-user-section, .profile-topics-section');
             if (sectionElement) {
@@ -1026,7 +1271,7 @@ let userData = null;
                                     photoURL: downloadURL
                                 });
                                 console.log('Auth profile photo updated');
-    } catch (error) {
+                            } catch (error) {
                                 console.error('Error updating auth profile:', error);
                             }
                             
@@ -1064,32 +1309,61 @@ let userData = null;
             return;
         }
 
-        const coverContainer = document.querySelector('.profile-cover');
-        if (!coverContainer) return;
+        // Remove any existing gradient picker and overlay
+        document.getElementById('gradient-picker-container')?.remove();
+        document.getElementById('gradient-picker-overlay')?.remove();
+
+        // Create and append overlay to body first (not to cover container)
+        const overlay = document.createElement('div');
+        overlay.id = 'gradient-picker-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+        overlay.style.zIndex = '1000'; // High z-index
+        document.body.appendChild(overlay);
         
         // Create gradient picker container
         const gradientPickerContainer = document.createElement('div');
         gradientPickerContainer.id = 'gradient-picker-container';
         gradientPickerContainer.className = 'gradient-picker-container';
         
+        // Apply styles directly to ensure proper positioning and z-index
+        gradientPickerContainer.style.position = 'fixed'; // Fixed instead of absolute
+        gradientPickerContainer.style.top = '50%';
+        gradientPickerContainer.style.left = '50%';
+        gradientPickerContainer.style.transform = 'translate(-50%, -50%)';
+        gradientPickerContainer.style.backgroundColor = 'var(--background-light, #fff)';
+        gradientPickerContainer.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.15)';
+        gradientPickerContainer.style.borderRadius = '8px';
+        gradientPickerContainer.style.padding = '20px';
+        gradientPickerContainer.style.width = '350px';
+        gradientPickerContainer.style.maxWidth = '90%';
+        gradientPickerContainer.style.zIndex = '1001'; // Higher than overlay
+        gradientPickerContainer.style.color = 'var(--text-color, #333)';
+        
         // Create gradient picker UI
         gradientPickerContainer.innerHTML = `
-            <div class="gradient-picker-header">
-                <h3>Choose Cover Gradient</h3>
-                <button class="close-gradient-picker"><i class="fas fa-times"></i></button>
+            <div class="gradient-picker-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--border-color, #eee); padding-bottom: 10px;">
+                <h3 style="margin: 0; font-size: 18px;">Choose Cover Gradient</h3>
+                <button class="close-gradient-picker" style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--text-muted, #666);">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <div class="gradient-color-inputs">
-                <div class="color-input-group">
-                    <label for="gradient-color-1">Start Color</label>
-                    <input type="color" id="gradient-color-1" value="#087ea4">
+            <div class="gradient-color-inputs" style="margin-bottom: 20px;">
+                <div class="color-input-group" style="margin-bottom: 15px;">
+                    <label for="gradient-color-1" style="display: block; margin-bottom: 5px; font-weight: 500;">Start Color</label>
+                    <input type="color" id="gradient-color-1" value="#087ea4" style="width: 100%; height: 40px; border: 1px solid var(--border-color, #ddd); border-radius: 4px;">
                 </div>
-                <div class="color-input-group">
-                    <label for="gradient-color-2">End Color</label>
-                    <input type="color" id="gradient-color-2" value="#2bc4bc">
+                <div class="color-input-group" style="margin-bottom: 15px;">
+                    <label for="gradient-color-2" style="display: block; margin-bottom: 5px; font-weight: 500;">End Color</label>
+                    <input type="color" id="gradient-color-2" value="#2bc4bc" style="width: 100%; height: 40px; border: 1px solid var(--border-color, #ddd); border-radius: 4px;">
                 </div>
-                <div class="direction-select-group">
-                    <label for="gradient-direction">Direction</label>
-                    <select id="gradient-direction">
+                <div class="direction-select-group" style="margin-bottom: 15px;">
+                    <label for="gradient-direction" style="display: block; margin-bottom: 5px; font-weight: 500;">Direction</label>
+                    <select id="gradient-direction" style="width: 100%; height: 40px; border: 1px solid var(--border-color, #ddd); border-radius: 4px; padding: 0 10px; background-color: var(--background-light, #fff);">
                         <option value="to right">→ Horizontal</option>
                         <option value="to bottom">↓ Vertical</option>
                         <option value="to right bottom">↘ Diagonal</option>
@@ -1097,17 +1371,17 @@ let userData = null;
                     </select>
                 </div>
             </div>
-            <div class="gradient-preview">
-                <div id="gradient-preview-box"></div>
+            <div class="gradient-preview" style="margin-bottom: 20px;">
+                <div id="gradient-preview-box" style="width: 100%; height: 80px; border-radius: 6px; border: 1px solid var(--border-color, #ddd);"></div>
             </div>
-            <div class="gradient-actions">
-                <button class="save-gradient-btn">Save as Cover</button>
-                <button class="cancel-gradient-btn">Cancel</button>
+            <div class="gradient-actions" style="display: flex; justify-content: space-between; gap: 10px;">
+                <button class="save-gradient-btn" style="flex: 1; background-color: var(--primary-color, #087ea4); color: white; border: none; border-radius: 4px; padding: 10px 15px; font-weight: 500; cursor: pointer;">Save as Cover</button>
+                <button class="cancel-gradient-btn" style="flex: 1; background-color: var(--background-light, #f5f5f5); border: 1px solid var(--border-color, #ddd); border-radius: 4px; padding: 10px 15px; font-weight: 500; cursor: pointer;">Cancel</button>
             </div>
         `;
         
-        // Add to cover container
-        coverContainer.appendChild(gradientPickerContainer);
+        // Add picker to body, not to the cover container
+        document.body.appendChild(gradientPickerContainer);
         
         // Get UI elements
         const closeBtn = gradientPickerContainer.querySelector('.close-gradient-picker');
@@ -1130,18 +1404,21 @@ let userData = null;
         // Set initial preview
         updatePreview();
         
+        // Function to close the gradient picker and clean up
+        function closeGradientPicker() {
+            document.getElementById('gradient-picker-container')?.remove();
+            document.getElementById('gradient-picker-overlay')?.remove();
+        }
+        
         // Add event listeners
         color1Input.addEventListener('input', updatePreview);
         color2Input.addEventListener('input', updatePreview);
         directionSelect.addEventListener('change', updatePreview);
         
-        closeBtn.addEventListener('click', () => {
-            gradientPickerContainer.remove();
-        });
+        closeBtn.addEventListener('click', closeGradientPicker);
+        overlay.addEventListener('click', closeGradientPicker);
         
-        cancelGradientBtn.addEventListener('click', () => {
-            gradientPickerContainer.remove();
-        });
+        cancelGradientBtn.addEventListener('click', closeGradientPicker);
         
         saveGradientBtn.addEventListener('click', () => {
             const direction = directionSelect.value;
@@ -1149,7 +1426,7 @@ let userData = null;
             const color2 = color2Input.value;
             
             saveGradientCover(direction, color1, color2);
-            gradientPickerContainer.remove();
+            closeGradientPicker();
         });
     }
 
@@ -1163,32 +1440,31 @@ let userData = null;
         try {
             // Show loading indicator
             const coverElement = document.querySelector('.profile-cover');
-            if (coverElement) {
-                const loadingIndicator = document.createElement('div');
-                loadingIndicator.className = 'upload-loading';
-                loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                loadingIndicator.style.position = 'absolute';
-                loadingIndicator.style.top = '50%';
-                loadingIndicator.style.left = '50%';
-                loadingIndicator.style.transform = 'translate(-50%, -50%)';
-                loadingIndicator.style.backgroundColor = 'rgba(0,0,0,0.5)';
-                loadingIndicator.style.color = 'white';
-                loadingIndicator.style.borderRadius = '8px';
-                loadingIndicator.style.width = '100%';
-                loadingIndicator.style.height = '100%';
-                loadingIndicator.style.display = 'flex';
-                loadingIndicator.style.alignItems = 'center';
-                loadingIndicator.style.justifyContent = 'center';
-                loadingIndicator.style.fontSize = '2rem';
-                loadingIndicator.style.zIndex = '10';
-                
-                coverElement.style.position = 'relative';
-                coverElement.appendChild(loadingIndicator);
-            }
+            if (!coverElement) return;
+            
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'upload-loading';
+            loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            loadingIndicator.style.position = 'absolute';
+            loadingIndicator.style.top = '50%';
+            loadingIndicator.style.left = '50%';
+            loadingIndicator.style.transform = 'translate(-50%, -50%)';
+            loadingIndicator.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            loadingIndicator.style.color = 'white';
+            loadingIndicator.style.borderRadius = '8px';
+            loadingIndicator.style.width = '100%';
+            loadingIndicator.style.height = '100%';
+            loadingIndicator.style.display = 'flex';
+            loadingIndicator.style.alignItems = 'center';
+            loadingIndicator.style.justifyContent = 'center';
+            loadingIndicator.style.fontSize = '2rem';
+            loadingIndicator.style.zIndex = '10';
+            
+            coverElement.style.position = 'relative';
+            coverElement.appendChild(loadingIndicator);
             
             // Create gradient data object
             const gradientData = {
-                type: 'gradient',
                 direction: direction,
                 colors: [color1, color2],
                 timestamp: new Date().toISOString()
@@ -1206,28 +1482,129 @@ let userData = null;
             userData.coverGradient = gradientData;
             userData.coverUrl = null;
             
-            // Update UI
-            const coverImg = document.querySelector('.profile-cover img');
-            if (coverImg) {
-                // Hide the image and apply gradient to the container
-                coverImg.style.display = 'none';
+            // Apply gradient to the cover container
+                coverElement.style.background = `linear-gradient(${direction}, ${color1}, ${color2})`;
                 
-                const coverContainer = document.querySelector('.profile-cover');
-                if (coverContainer) {
-                    coverContainer.style.background = `linear-gradient(${direction}, ${color1}, ${color2})`;
-                }
+                // Hide the cover image if it exists
+                const coverImg = coverElement.querySelector('img');
+                if (coverImg) {
+                    coverImg.style.display = 'none';
             }
             
             // Remove loading indicator
-            document.querySelector('.upload-loading')?.remove();
+            loadingIndicator.remove();
+            
+            // Show success notification
+            showNotification('Gradient cover saved successfully!', 'success');
             
             console.log('Gradient cover saved successfully');
         } catch (error) {
             // Remove loading indicator if any
             document.querySelector('.upload-loading')?.remove();
             console.error('Error saving gradient cover:', error);
-            alert('Failed to save gradient cover. Please try again.');
+            showNotification('Failed to save gradient cover. Please try again.', 'error');
         }
+    }
+
+    // Show notification
+    function showNotification(message, type = 'info') {
+        // Remove any existing notifications
+        const existingNotification = document.querySelector('.profile-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `profile-notification ${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            </div>
+            <button class="close-notification"><i class="fas fa-times"></i></button>
+        `;
+        
+        // Style the notification
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3';
+        notification.style.color = 'white';
+        notification.style.padding = '12px 16px';
+        notification.style.borderRadius = '4px';
+        notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        notification.style.zIndex = '9999';
+        notification.style.display = 'flex';
+        notification.style.alignItems = 'center';
+        notification.style.justifyContent = 'space-between';
+        notification.style.minWidth = '250px';
+        notification.style.maxWidth = '80%';
+        notification.style.animation = 'fadeInUp 0.3s ease-out forwards';
+        
+        // Add styles for the content
+        const content = notification.querySelector('.notification-content');
+        content.style.display = 'flex';
+        content.style.alignItems = 'center';
+        content.style.gap = '8px';
+        
+        // Add styles for the close button
+        const closeBtn = notification.querySelector('.close-notification');
+        closeBtn.style.background = 'none';
+        closeBtn.style.border = 'none';
+        closeBtn.style.color = 'white';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.padding = '0';
+        closeBtn.style.fontSize = '16px';
+        closeBtn.style.marginLeft = '10px';
+        
+        // Add to DOM
+        document.body.appendChild(notification);
+        
+        // Add keyframes for animation if not already present
+        if (!document.getElementById('notification-keyframes')) {
+            const keyframes = document.createElement('style');
+            keyframes.id = 'notification-keyframes';
+            keyframes.textContent = `
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+                @keyframes fadeOut {
+                    from {
+                        opacity: 1;
+                    }
+                    to {
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(keyframes);
+        }
+        
+        // Add event listener to close button
+        closeBtn.addEventListener('click', () => {
+            notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+        
+        // Auto-close after 5 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }, 5000);
     }
 
     // Show shimmer loading effects for profile
@@ -1399,6 +1776,8 @@ let userData = null;
     
     // Hide shimmer effects
     function hideProfileShimmer() {
+        console.log('Hiding profile shimmer...');
+        
         // Remove avatar shimmer
         const profileAvatar = document.querySelector('.profile-avatar');
         if (profileAvatar) {
@@ -1425,6 +1804,75 @@ let userData = null;
             }
         }
         
+        // Re-render profile info
+        const profileInfo = document.querySelector('.profile-info');
+        if (profileInfo) {
+            const profileName = document.createElement('h1');
+            profileName.className = 'profile-name';
+            profileName.textContent = userData.displayName || (currentUser ? currentUser.displayName : 'User');
+            
+            const profileBio = document.createElement('p');
+            profileBio.className = 'profile-bio';
+            profileBio.textContent = userData.bio || 'No bio available';
+            
+            // Build badges container
+            const badgesContainer = document.createElement('div');
+            badgesContainer.className = 'profile-badges';
+            
+            // Verified badge
+            if (userData.verified) {
+                const verifiedBadge = document.createElement('span');
+                verifiedBadge.className = 'profile-badge verified';
+                verifiedBadge.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+                badgesContainer.appendChild(verifiedBadge);
+            }
+            
+            // Premium badge
+            if (userData.premium) {
+                const premiumBadge = document.createElement('span');
+                premiumBadge.className = 'profile-badge premium';
+                premiumBadge.innerHTML = '<i class="fas fa-crown"></i> Premium';
+                badgesContainer.appendChild(premiumBadge);
+            }
+            
+            // Clear and rebuild profile info
+            profileInfo.innerHTML = '';
+            profileInfo.appendChild(profileName);
+            profileInfo.appendChild(profileBio);
+            profileInfo.appendChild(badgesContainer);
+            
+            // Rebuild stats
+            const statsContainer = document.createElement('div');
+            statsContainer.className = 'profile-stats';
+            
+            // Stats data
+            const stats = [
+                { value: userData.stats?.discussions || 0, label: 'Discussions' },
+                { value: formatNumber(userData.stats?.reputation || 0), label: 'Reputation' },
+                { value: userData.stats?.comments || 0, label: 'Comments' },
+                { value: userData.stats?.joined || '', label: 'Joined' }
+            ];
+            
+            stats.forEach(stat => {
+                const statEl = document.createElement('div');
+                statEl.className = 'profile-stat';
+                
+                const valueEl = document.createElement('span');
+                valueEl.className = 'stat-value';
+                valueEl.textContent = stat.value;
+                
+                const labelEl = document.createElement('span');
+                labelEl.className = 'stat-label';
+                labelEl.textContent = stat.label;
+                
+                statEl.appendChild(valueEl);
+                statEl.appendChild(labelEl);
+                statsContainer.appendChild(statEl);
+            });
+            
+            profileInfo.appendChild(statsContainer);
+        }
+        
         // Remove shimmer from sidebar
         const sidebar = document.querySelector('.profile-sidebar');
         if (sidebar) {
@@ -1432,9 +1880,23 @@ let userData = null;
             renderSidebar();
         }
         
-        // Remove posts shimmer
+        // Remove posts shimmer and render discussions
         const shimmerPosts = document.querySelectorAll('.shimmer-post');
         shimmerPosts.forEach(post => post.remove());
+        renderDiscussions();
+        
+        // Remove any remaining shimmer elements
+        document.querySelectorAll('.shimmer').forEach(el => {
+            // Make sure it's not inside a template or hidden section
+            if (el.offsetParent !== null) {
+                el.remove();
+            }
+        });
+        
+        // Ensure tabs are set up properly
+        setupTabNavigation();
+        
+        console.log('Profile shimmer hidden, content now visible');
     }
     
     // Add shimmer styles to the document if not already present
@@ -1540,6 +2002,243 @@ let userData = null;
                 }
             `;
             document.head.appendChild(styleEl);
+        }
+    }
+
+    // Show notification function
+    function showNotification(message, type = 'info') {
+        // Remove any existing notifications
+        const existingNotifications = document.querySelectorAll('.notification');
+        existingNotifications.forEach(notification => {
+            notification.remove();
+        });
+
+        // Create notification element
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${message}</span>
+                <button class="notification-close"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+
+        // Add styles if not already in CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                max-width: 350px;
+                z-index: 10000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease-out;
+                animation: slideIn 0.3s forwards;
+            }
+            .notification-content {
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .notification-success .notification-content {
+                background-color: #d4edda;
+                color: #155724;
+                border-left: 4px solid #28a745;
+            }
+            .notification-error .notification-content {
+                background-color: #f8d7da;
+                color: #721c24;
+                border-left: 4px solid #dc3545;
+            }
+            .notification-info .notification-content {
+                background-color: #d1ecf1;
+                color: #0c5460;
+                border-left: 4px solid #17a2b8;
+            }
+            .notification-close {
+                background: none;
+                border: none;
+                color: inherit;
+                cursor: pointer;
+                margin-left: 10px;
+                opacity: 0.7;
+            }
+            .notification-close:hover {
+                opacity: 1;
+            }
+            @keyframes slideIn {
+                to { transform: translateX(0); }
+            }
+            @keyframes slideOut {
+                to { transform: translateX(400px); }
+            }
+            .notification.closing {
+                animation: slideOut 0.3s forwards;
+            }
+            @media (max-width: 768px) {
+                .notification {
+                    top: 10px;
+                    right: 10px;
+                    left: 10px;
+                    max-width: none;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Add to document
+        document.body.appendChild(notification);
+
+        // Add close button functionality
+        const closeBtn = notification.querySelector('.notification-close');
+        closeBtn.addEventListener('click', () => {
+            notification.classList.add('closing');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        });
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (document.body.contains(notification)) {
+                notification.classList.add('closing');
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }
+
+    // Initialize variables to store original profile values
+    window.originalProfileValues = {};
+
+    // Start editing a section
+    function startEditing(e) {
+        const section = e.target.dataset.section || 'header';
+        isEditing = true;
+        
+        // Store original values for comparison
+        window.originalProfileValues = window.originalProfileValues || {};
+        
+        if (section === 'header') {
+            // Enable editing of header elements
+            const nameElement = document.querySelector('.profile-name');
+            const bioElement = document.querySelector('.profile-bio');
+            
+            // Store original values
+            window.originalProfileValues.displayName = userData.displayName;
+            window.originalProfileValues.bio = userData.bio;
+            
+            // Replace with editable fields
+            nameElement.innerHTML = `<input type="text" id="edit-name" value="${userData.displayName}">`;
+            bioElement.innerHTML = `<textarea id="edit-bio">${userData.bio}</textarea>`;
+            
+            // Add input change listeners to toggle save button visibility
+            const nameInput = document.getElementById('edit-name');
+            const bioInput = document.getElementById('edit-bio');
+            
+            // Change button to Save
+            e.target.textContent = 'Save Profile';
+            e.target.classList.add('disabled-btn');
+            e.target.style.opacity = '0.6';
+            e.target.style.cursor = 'default';
+            e.target.removeEventListener('click', startEditing);
+            e.target.addEventListener('click', () => saveChanges({ target: { dataset: { section: 'header' } } }));
+            
+            // Add event listeners to detect changes
+            function checkForChanges() {
+                const displayNameChanged = nameInput.value !== window.originalProfileValues.displayName;
+                const bioChanged = bioInput.value !== window.originalProfileValues.bio;
+                
+                if (displayNameChanged || bioChanged) {
+                    e.target.classList.remove('disabled-btn');
+                    e.target.style.opacity = '1';
+                    e.target.style.cursor = 'pointer';
+                } else {
+                    e.target.classList.add('disabled-btn');
+                    e.target.style.opacity = '0.6';
+                    e.target.style.cursor = 'default';
+                }
+            }
+            
+            nameInput.addEventListener('input', checkForChanges);
+            bioInput.addEventListener('input', checkForChanges);
+            
+        } else {
+            // Enable editing for other sections
+            const sectionElement = document.querySelector('.about-user-section, .profile-topics-section');
+            if (sectionElement) {
+                // Store original values
+                window.originalProfileValues[section] = {};
+                
+                const fields = sectionElement.querySelectorAll('.about-field');
+                fields.forEach(field => {
+                    const valueEl = field.querySelector('.field-value');
+                    const editEl = field.querySelector('.edit-field');
+                    if (valueEl && editEl) {
+                        const fieldInputs = editEl.querySelectorAll('[data-field]');
+                        
+                        // Store original values for each field
+                        fieldInputs.forEach(input => {
+                            const fieldName = input.dataset.field;
+                            window.originalProfileValues[section][fieldName] = input.value;
+                        });
+                        
+                        valueEl.style.display = 'none';
+                        editEl.style.display = 'block';
+                    }
+                });
+                
+                // Show save/cancel buttons
+                const editBtn = sectionElement.querySelector('.edit-profile-btn');
+                const actions = sectionElement.querySelector('.edit-actions');
+                if (editBtn && actions) {
+                    editBtn.style.display = 'none';
+                    actions.style.display = 'flex';
+                }
+                
+                // Disable the save button initially
+                const saveBtn = actions.querySelector('.save-profile-btn');
+                saveBtn.classList.add('disabled-btn');
+                saveBtn.style.opacity = '0.6';
+                saveBtn.style.cursor = 'default';
+                
+                // Add change event listeners to all inputs
+                const inputs = sectionElement.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    const fieldName = input.dataset.field;
+                    if (fieldName) {
+                        input.addEventListener('input', () => {
+                            let hasChanges = false;
+                            
+                            // Check all inputs for changes
+                            inputs.forEach(inp => {
+                                const field = inp.dataset.field;
+                                if (field && window.originalProfileValues[section][field] !== inp.value) {
+                                    hasChanges = true;
+                                }
+                            });
+                            
+                            // Enable/disable save button based on changes
+                            if (hasChanges) {
+                                saveBtn.classList.remove('disabled-btn');
+                                saveBtn.style.opacity = '1';
+                                saveBtn.style.cursor = 'pointer';
+                            } else {
+                                saveBtn.classList.add('disabled-btn');
+                                saveBtn.style.opacity = '0.6';
+                                saveBtn.style.cursor = 'default';
+                            }
+                        });
+                    }
+                });
+            }
         }
     }
 }); 
