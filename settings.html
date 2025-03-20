@@ -370,6 +370,121 @@
             color: var(--text-color);
             border: 1px solid var(--border-color);
         }
+        
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: var(--background-color, white);
+            border-radius: var(--radius, 4px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            animation: modalFadeIn 0.3s;
+            position: relative;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border-color, #e0e0e0);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            color: var(--text-color, #333);
+        }
+        
+        .modal-close {
+            color: var(--text-muted, #999);
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-color, #333);
+        }
+        
+        .modal-body {
+            padding: 1.25rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .modal-body p {
+            color: var(--text-color, #333);
+            margin-top: 0;
+        }
+        
+        .modal-body ul {
+            margin-bottom: 1.5rem;
+            color: var(--text-color, #333);
+            padding-left: 1.5rem;
+        }
+        
+        .modal-body ul li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-footer {
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--border-color, #e0e0e0);
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .error-message {
+            color: var(--danger-color, #e74c3c);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(231, 76, 60, 0.1);
+            border-radius: var(--radius, 4px);
+            display: none;
+        }
+        
+        .success-message {
+            color: var(--success-color, #2ecc71);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: rgba(46, 204, 113, 0.1);
+            border-radius: var(--radius, 4px);
+            display: none;
+        }
+        
+        /* Responsive modal */
+        @media (max-width: 576px) {
+            .modal-content {
+                max-width: 90%;
+                margin: 0 1rem;
+            }
+            
+            .modal-body {
+                max-height: 60vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -422,7 +537,7 @@
         <div class="container">
 
             <div class="settings-container">
-                <div class="settings-alert success" id="settingsSaved">
+                <div class="settings-alert success" id="settingsSaved" style="display: none;">
                     <i class="material-icons">check_circle</i> Settings saved successfully!
                 </div>
                 
@@ -647,8 +762,79 @@
                     </div>
                 </div>
                 
+                <!-- Account Settings -->
+                <div class="settings-section" id="account-section">
+                    <h2><i class="material-icons">account_circle</i> Account</h2>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Email Address</h3>
+                            <p id="user-email">Loading...</p>
+                        </div>
+                        <button class="settings-button" id="change-email-btn">
+                            Change Email
+                        </button>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Password</h3>
+                            <p>Change your account password</p>
+                        </div>
+                        <button class="settings-button" id="change-password-btn">
+                            Change Password
+                        </button>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Delete Account</h3>
+                            <p>Permanently delete your account and all your data</p>
+                            <div id="delete-error" class="error-message" style="display: none;"></div>
+                            <div id="delete-success" class="success-message" style="display: none;"></div>
+                        </div>
+                        <button class="settings-button danger" id="delete-account-btn">
+                            Delete Account
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Delete Account Modal -->
+                <div id="delete-account-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Delete Account</h3>
+                            <span class="modal-close">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete your account? This action cannot be undone and will permanently delete:</p>
+                            <ul>
+                                <li>Your profile and personal information</li>
+                                <li>Your profile pictures</li>
+                                <li>Your account credentials</li>
+                            </ul>
+                            <p><strong>Note:</strong> Your posts, comments, and other contributions will remain visible as "deleted user".</p>
+                            
+                            <div class="form-group">
+                                <label for="delete-password">Enter your password to confirm:</label>
+                                <div class="input-with-icon">
+                                    <i class="fas fa-lock"></i>
+                                    <input type="password" id="delete-password" placeholder="Your current password">
+                                    <button type="button" class="password-toggle" aria-label="Show password">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="settings-button" id="cancel-delete-btn">Cancel</button>
+                            <button class="settings-button danger" id="confirm-delete-btn">Delete My Account</button>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Save Button -->
-                <div style="text-align: center; margin-bottom: 2rem;">
+                <div style="text-align: center; margin-bottom: 2rem; display: none;">
                     <button class="settings-button primary" id="saveSettings">
                         <i class="material-icons" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.5rem;">save</i> Save Settings
                     </button>
@@ -793,6 +979,8 @@
             // Dark mode toggle
             darkModeToggle.addEventListener('change', () => {
                 applyDarkMode(darkModeToggle.checked);
+                // Auto-save setting
+                localStorage.setItem('darkMode', darkModeToggle.checked ? 'enabled' : 'disabled');
             });
             
             // Theme selection
@@ -810,6 +998,9 @@
                     // Apply theme
                     applyTheme(theme);
                     
+                    // Auto-save theme setting
+                    localStorage.setItem('theme', theme);
+                    
                     // Apply dark mode based on toggle for special themes,
                     // or based on theme selection for light/dark/auto
                     if (theme.startsWith('theme-')) {
@@ -817,13 +1008,16 @@
                     } else if (theme === 'dark') {
                         darkModeToggle.checked = true;
                         applyDarkMode(true);
+                        localStorage.setItem('darkMode', 'enabled');
                     } else if (theme === 'light') {
                         darkModeToggle.checked = false;
                         applyDarkMode(false);
+                        localStorage.setItem('darkMode', 'disabled');
                     } else if (theme === 'auto') {
                         const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
                         darkModeToggle.checked = systemDarkMode;
                         applyDarkMode(systemDarkMode);
+                        localStorage.setItem('darkMode', systemDarkMode ? 'enabled' : 'disabled');
                     }
                 });
             });
@@ -840,6 +1034,9 @@
                     // Apply font
                     const font = option.dataset.font;
                     applyFontFamily(font);
+                    
+                    // Auto-save font setting
+                    localStorage.setItem('fontFamily', font);
                 });
             });
             
@@ -848,6 +1045,12 @@
                 const fontSize = fontSizeSlider.value;
                 fontSizeValue.textContent = fontSize + 'px';
                 fontSizeSample.style.fontSize = fontSize + 'px';
+            });
+            
+            fontSizeSlider.addEventListener('change', () => {
+                // Auto-save font size setting
+                localStorage.setItem('fontSize', fontSizeSlider.value);
+                applyFontSize(fontSizeSlider.value);
             });
             
             // Get other settings from localStorage
@@ -864,64 +1067,38 @@
                 document.documentElement.classList.add('reduce-animations');
             }
             
-            // Save settings
-            document.getElementById('saveSettings').addEventListener('click', () => {
-                // Save theme
-                let selectedTheme = 'light';
-                themeOptions.forEach(option => {
-                    if (option.classList.contains('active')) {
-                        selectedTheme = option.dataset.theme;
-                    }
-                });
-                localStorage.setItem('theme', selectedTheme);
-                
-                // Save dark mode state
-                const isDarkMode = darkModeToggle.checked;
-                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
-                
-                // Save font family
-                let selectedFont = 'Poppins';
-                fontOptions.forEach(option => {
-                    if (option.classList.contains('active')) {
-                        selectedFont = option.dataset.font;
-                    }
-                });
-                localStorage.setItem('fontFamily', selectedFont);
-                
-                // Save font size
-                const fontSize = fontSizeSlider.value;
-                localStorage.setItem('fontSize', fontSize);
-                
-                // Save other settings
-                const reduceAnimations = document.getElementById('reduceAnimations').checked;
-                localStorage.setItem('reduceAnimations', reduceAnimations);
-                localStorage.setItem('emailNotifications', document.getElementById('emailNotifications').checked);
-                localStorage.setItem('pushNotifications', document.getElementById('pushNotifications').checked);
-                localStorage.setItem('notificationSound', document.getElementById('notificationSound').checked);
-                localStorage.setItem('publicProfile', document.getElementById('publicProfile').checked);
-                localStorage.setItem('onlineStatus', document.getElementById('onlineStatus').checked);
-                localStorage.setItem('dataCollection', document.getElementById('dataCollection').checked);
-                
-                // Apply settings immediately
-                applyTheme(selectedTheme);
-                applyDarkMode(isDarkMode);
-                applyFontFamily(selectedFont);
-                applyFontSize(fontSize);
-                
-                // Apply reduce animations immediately
-                if (reduceAnimations) {
+            // Add auto-save functionality for other toggles
+            document.getElementById('reduceAnimations').addEventListener('change', function() {
+                localStorage.setItem('reduceAnimations', this.checked);
+                if (this.checked) {
                     document.documentElement.classList.add('reduce-animations');
                 } else {
                     document.documentElement.classList.remove('reduce-animations');
                 }
-                
-                // Show success message
-                const alert = document.getElementById('settingsSaved');
-                alert.style.display = 'block';
-                
-                setTimeout(() => {
-                    alert.style.display = 'none';
-                }, 3000);
+            });
+            
+            document.getElementById('emailNotifications').addEventListener('change', function() {
+                localStorage.setItem('emailNotifications', this.checked);
+            });
+            
+            document.getElementById('pushNotifications').addEventListener('change', function() {
+                localStorage.setItem('pushNotifications', this.checked);
+            });
+            
+            document.getElementById('notificationSound').addEventListener('change', function() {
+                localStorage.setItem('notificationSound', this.checked);
+            });
+            
+            document.getElementById('publicProfile').addEventListener('change', function() {
+                localStorage.setItem('publicProfile', this.checked);
+            });
+            
+            document.getElementById('onlineStatus').addEventListener('change', function() {
+                localStorage.setItem('onlineStatus', this.checked);
+            });
+            
+            document.getElementById('dataCollection').addEventListener('change', function() {
+                localStorage.setItem('dataCollection', this.checked);
             });
             
             // Listen for system theme changes if auto is selected

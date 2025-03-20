@@ -18,7 +18,14 @@ const userData = {
     interests: [],
     bio: '',
     bioTags: [],
-    location: ''
+    location: '',
+    education: '',
+    institution: '',
+    website: '',
+    badges: {
+        verified: false,
+        premium: false
+    }
 };
 
 // Default avatar options
@@ -57,6 +64,7 @@ const bioPreview = document.querySelector('.bio-preview');
 const bioPreviewContent = document.getElementById('bio-preview-content');
 const bioTags = document.querySelectorAll('.bio-tag');
 const previewToggle = document.querySelector('.preview-toggle');
+const skipAvatarBtn = document.getElementById('skip-avatar');
 
 document.addEventListener('DOMContentLoaded', () => {
     initializeSignupForm();
@@ -77,7 +85,17 @@ function initializeSignupForm() {
 
     // Initialize username validation
     if (usernameInput) {
-        usernameInput.addEventListener('input', debounce(validateUsername, 500));
+        usernameInput.addEventListener('input', debounce(function() {
+            if (usernameInput.value.trim().length >= 3) {
+                validateUsername();
+            }
+        }, 500));
+        
+        usernameInput.addEventListener('blur', function() {
+            if (usernameInput.value.trim()) {
+                validateUsername();
+            }
+        });
     }
 
     // Initialize avatar selection
@@ -85,23 +103,45 @@ function initializeSignupForm() {
 
     // Initialize password strength meter
     if (passwordInput) {
-        passwordInput.addEventListener('input', checkPasswordStrength);
-        passwordInput.addEventListener('focus', () => {
-            passwordRequirements.classList.add('active');
+        passwordInput.addEventListener('input', function() {
+            updatePasswordStrength(this.value);
         });
-        passwordInput.addEventListener('blur', () => {
-            if (passwordInput.value.length === 0) {
-                passwordRequirements.classList.remove('active');
+        
+        passwordInput.addEventListener('focus', function() {
+            document.querySelector('.password-requirements').classList.add('active');
+        });
+        
+        passwordInput.addEventListener('blur', function() {
+            if (!this.value) {
+                document.querySelector('.password-requirements').classList.remove('active');
+            }
+            
+            // Store password if valid
+            const strength = updatePasswordStrength(this.value);
+            if (strength >= 3) {
+                userData.password = this.value;
             }
         });
     }
 
     // Initialize password match checker
     if (confirmPasswordInput && passwordInput) {
-        confirmPasswordInput.addEventListener('input', checkPasswordMatch);
-        passwordInput.addEventListener('input', () => {
-            if (confirmPasswordInput.value.length > 0) {
-                checkPasswordMatch();
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword) {
+                passwordMatchIndicator.classList.add('visible');
+                
+                if (password === confirmPassword) {
+                    passwordMatchIndicator.classList.add('match');
+                    passwordMatchIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+                } else {
+                    passwordMatchIndicator.classList.remove('match');
+                    passwordMatchIndicator.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+                }
+            } else {
+                passwordMatchIndicator.classList.remove('visible');
             }
         });
     }
@@ -131,18 +171,15 @@ function initializeSignupForm() {
     const passwordToggles = document.querySelectorAll('.password-toggle');
     passwordToggles.forEach(toggle => {
         toggle.addEventListener('click', function() {
-            const passwordInput = this.previousElementSibling;
+            const input = this.closest('.input-with-icon').querySelector('input');
             const icon = this.querySelector('i');
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                passwordInput.classList.add('password-input');
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
             } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
             }
         });
     });
@@ -401,6 +438,9 @@ function validateProfileStep() {
     const gender = document.getElementById('gender').value;
     const birthday = document.getElementById('birthday').value;
     const bio = document.getElementById('bio').value.trim();
+    const education = document.getElementById('education')?.value.trim();
+    const institution = document.getElementById('institution')?.value.trim();
+    const website = document.getElementById('website')?.value.trim();
     
     // Some basic validation
     if (!displayName) {
@@ -421,6 +461,15 @@ function validateProfileStep() {
     userData.bioTags = Array.from(document.querySelectorAll('.bio-tag.selected'))
         .map(tag => tag.dataset.tag);
     userData.location = document.getElementById('location').value.trim();
+    userData.education = education || '';
+    userData.institution = institution || '';
+    userData.website = website || '';
+    
+    // If no avatar was selected (through upload, default, or skip), use initials
+    if (!userData.photoUrl) {
+        const initials = displayName.split(' ').map(name => name[0]).join('').toUpperCase();
+        userData.photoUrl = `https://ui-avatars.com/api/?name=${initials}&background=087ea4&color=fff&size=128`;
+    }
     
     return true;
 }
@@ -441,7 +490,47 @@ function validateInterestsStep() {
     return true;
 }
 
-// Username validation
+// Enhanced feedback function
+function showFeedback(element, message, type) {
+    element.textContent = message;
+    element.className = 'feedback';
+    
+    if (type) {
+        element.classList.add(type);
+        
+        // Also add class to the closest input-with-icon
+        const inputWrapper = element.closest('.form-group').querySelector('.input-with-icon');
+        if (inputWrapper) {
+            inputWrapper.classList.remove('input-error', 'input-success');
+            if (type === 'error') {
+                inputWrapper.classList.add('input-error');
+            } else if (type === 'success') {
+                inputWrapper.classList.add('input-success');
+            }
+        }
+    }
+}
+
+// Better error display
+function showError(message) {
+    const errorElement = document.getElementById('signup-error');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    errorElement.classList.add('visible');
+    
+    // Scroll to error
+    errorElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+        errorElement.classList.remove('visible');
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+        }, 300);
+    }, 5000);
+}
+
+// Enhanced username validation
 async function validateUsername() {
     const username = usernameInput.value.trim();
     
@@ -449,32 +538,28 @@ async function validateUsername() {
     usernameSpinner.style.display = 'inline-block';
     
     // Clear previous feedback
-    usernameFeedback.textContent = '';
-    usernameFeedback.classList.remove('error', 'success');
+    showFeedback(usernameFeedback, '', null);
     usernameSuggestions.innerHTML = '';
     usernameSuggestions.style.display = 'none';
     
     // Basic validation
     if (!username) {
-        usernameFeedback.textContent = 'Username is required';
-        usernameFeedback.classList.add('error');
+        showFeedback(usernameFeedback, 'Username is required', 'error');
         usernameSpinner.style.display = 'none';
-        return;
+        return false;
     }
     
     if (username.length < 3) {
-        usernameFeedback.textContent = 'Username must be at least 3 characters long';
-        usernameFeedback.classList.add('error');
+        showFeedback(usernameFeedback, 'Username must be at least 3 characters long', 'error');
         usernameSpinner.style.display = 'none';
-        return;
+        return false;
     }
     
     // Check if username contains spaces or special characters
     if (!/^[a-zA-Z0-9_]+$/.test(username)) {
-        usernameFeedback.textContent = 'Username can only contain letters, numbers, and underscores';
-        usernameFeedback.classList.add('error');
+        showFeedback(usernameFeedback, 'Username can only contain letters, numbers, and underscores', 'error');
         usernameSpinner.style.display = 'none';
-        return;
+        return false;
     }
     
     try {
@@ -482,8 +567,7 @@ async function validateUsername() {
         const exists = await checkUsernameExists(username);
         
         if (exists) {
-            usernameFeedback.textContent = 'Username already taken';
-            usernameFeedback.classList.add('error');
+            showFeedback(usernameFeedback, 'Username already taken', 'error');
             
             // Generate suggestions
             const suggestions = await generateUsernameSuggestions(username);
@@ -507,44 +591,55 @@ async function validateUsername() {
                     });
                 });
             }
+            
+            usernameSpinner.style.display = 'none';
+            return false;
         } else {
-            usernameFeedback.textContent = 'Username is available';
-            usernameFeedback.classList.add('success');
+            showFeedback(usernameFeedback, 'Username is available', 'success');
+            userData.username = username;
+            usernameSpinner.style.display = 'none';
+            return true;
         }
     } catch (error) {
         console.error('Error validating username:', error);
-        usernameFeedback.textContent = 'Error checking username availability';
-        usernameFeedback.classList.add('error');
+        showFeedback(usernameFeedback, 'Error checking username availability', 'error');
+        usernameSpinner.style.display = 'none';
+        return false;
     }
-    
-    // Hide spinner
-    usernameSpinner.style.display = 'none';
 }
 
 function initializeAvatarSelection() {
-    // Initialize custom file upload
-    if (customFileUpload && fileInput) {
-        customFileUpload.addEventListener('click', () => {
-            fileInput.click();
-        });
-        
-        fileInput.addEventListener('change', handleFileSelection);
-    }
-    
-    // Initialize default avatars
+    // Create default avatar options
     if (defaultAvatarContainer) {
-        // Create avatar elements
-        defaultAvatars.forEach(avatar => {
+        defaultAvatars.forEach(avatarUrl => {
             const avatarElement = document.createElement('div');
             avatarElement.className = 'default-avatar';
-            avatarElement.innerHTML = `<img src="${avatar}" alt="Avatar">`;
+            avatarElement.innerHTML = `<img src="${avatarUrl}" alt="Default avatar">`;
+            avatarElement.addEventListener('click', () => selectDefaultAvatar(avatarUrl));
             defaultAvatarContainer.appendChild(avatarElement);
-            
-            // Add click handler
-            avatarElement.addEventListener('click', () => {
-                selectDefaultAvatar(avatar);
-            });
         });
+    }
+    
+    // Initialize file input for custom avatar
+    if (fileInput) {
+        fileInput.addEventListener('change', handleFileSelection);
+        customFileUpload.addEventListener('click', () => fileInput.click());
+        customFileUpload.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+    }
+    
+    // Initialize skip avatar button
+    if (skipAvatarBtn) {
+        skipAvatarBtn.addEventListener('click', skipAvatarSelection);
+    }
+    
+    // Initialize avatar with default image
+    if (avatarPreview) {
+        avatarPreview.style.display = 'block';
     }
 }
 
@@ -555,13 +650,13 @@ function handleFileSelection(e) {
     
     // Check file type
     if (!file.type.startsWith('image/')) {
-        alert('Please select an image file.');
+        showError('Please select an image file.');
         return;
     }
     
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB.');
+        showError('File size should be less than 5MB.');
         return;
     }
     
@@ -601,6 +696,29 @@ function selectDefaultAvatar(avatarUrl) {
     
     // Set the userData
     userData.photoUrl = avatarUrl;
+    userData.photoDeleteUrl = '';
+}
+
+function skipAvatarSelection() {
+    // Reset to default avatar based on initials
+    const displayName = document.getElementById('display-name').value.trim() || 'User';
+    const initials = displayName.split(' ').map(name => name[0]).join('').toUpperCase();
+    const defaultAvatarUrl = `https://ui-avatars.com/api/?name=${initials}&background=087ea4&color=fff&size=128`;
+    
+    avatarPreview.src = defaultAvatarUrl;
+    
+    // Clear file input
+    if (fileInput) {
+        fileInput.value = '';
+    }
+    
+    // Deselect any default avatars
+    document.querySelectorAll('.default-avatar').forEach(avatar => {
+        avatar.classList.remove('selected');
+    });
+    
+    // Use initials avatar
+    userData.photoUrl = defaultAvatarUrl;
     userData.photoDeleteUrl = '';
 }
 
@@ -663,27 +781,279 @@ async function handleSignupSubmit(e) {
     }
 }
 
-// Helper functions
-function showError(elementId, message) {
-    const element = document.getElementById(elementId);
-    const feedback = document.getElementById(`${elementId}-feedback`) || 
-                    document.createElement('div');
-    
-    if (!feedback.id) {
-        feedback.id = `${elementId}-feedback`;
-        feedback.className = 'feedback error';
-        element.parentNode.appendChild(feedback);
-    }
-    
-    feedback.textContent = message;
-    feedback.classList.add('error');
-    element.classList.add('input-error');
-}
-
 function debounce(func, wait) {
     let timeout;
     return function(...args) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), wait);
     };
-} 
+}
+
+// Update the button states with loading indicators
+function setButtonLoading(button, isLoading) {
+    if (isLoading) {
+        button.classList.add('loading');
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner';
+        spinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        button.prepend(spinner);
+        button.disabled = true;
+    } else {
+        button.classList.remove('loading');
+        const spinner = button.querySelector('.spinner');
+        if (spinner) spinner.remove();
+        button.disabled = false;
+    }
+}
+
+// Show the password strength in real-time
+function updatePasswordStrength(password) {
+    const strengthBar = document.querySelector('.password-strength-bar');
+    const requirements = document.querySelector('.password-requirements');
+    
+    // Show requirements when field is focused
+    requirements.classList.add('active');
+    
+    // Reset all requirements
+    document.querySelectorAll('.requirement').forEach(req => {
+        req.classList.remove('met');
+        req.classList.add('unmet');
+    });
+    
+    // Check each requirement
+    const hasLength = password.length >= 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecial = /[^A-Za-z0-9]/.test(password);
+    
+    // Update requirement indicators
+    if (hasLength) document.getElementById('req-length').classList.replace('unmet', 'met');
+    if (hasUppercase) document.getElementById('req-uppercase').classList.replace('unmet', 'met');
+    if (hasLowercase) document.getElementById('req-lowercase').classList.replace('unmet', 'met');
+    if (hasNumber) document.getElementById('req-number').classList.replace('unmet', 'met');
+    if (hasSpecial) document.getElementById('req-special').classList.replace('unmet', 'met');
+    
+    // Calculate strength
+    let strength = 0;
+    if (hasLength) strength++;
+    if (hasUppercase) strength++;
+    if (hasLowercase) strength++;
+    if (hasNumber) strength++;
+    if (hasSpecial) strength++;
+    
+    // Update strength bar
+    strengthBar.className = 'password-strength-bar';
+    if (password.length === 0) {
+        strengthBar.style.width = '0';
+    } else if (strength <= 2) {
+        strengthBar.classList.add('weak');
+    } else if (strength === 3) {
+        strengthBar.classList.add('medium');
+    } else if (strength === 4) {
+        strengthBar.classList.add('strong');
+    } else {
+        strengthBar.classList.add('very-strong');
+    }
+    
+    return strength;
+}
+
+// Enhanced navigation between steps with validation
+function goToStep(step) {
+    // Validate current step before proceeding
+    const currentStep = parseInt(document.querySelector('.step-card.active').id.split('-')[1]);
+    
+    if (step > currentStep && !validateStep(currentStep)) {
+        return false;
+    }
+    
+    // Hide all steps
+    stepCards.forEach(stepCard => {
+        stepCard.classList.remove('active');
+    });
+    
+    // Show target step
+    document.getElementById(`step-${step}`).classList.add('active');
+    
+    // Update progress bar
+    document.querySelector('.progress-line').dataset.progress = step - 1;
+    
+    // Update step indicators
+    progressSteps.forEach(progressStep => {
+        const stepNum = parseInt(progressStep.dataset.step);
+        
+        progressStep.classList.remove('active', 'complete');
+        
+        if (stepNum === step) {
+            progressStep.classList.add('active');
+        } else if (stepNum < step) {
+            progressStep.classList.add('complete');
+        }
+    });
+    
+    // Scroll to top of form
+    document.querySelector('.auth-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    return true;
+}
+
+// Better form submission with loading state
+async function submitSignup(e) {
+    e.preventDefault();
+    
+    // Final validation of all steps
+    if (!validateAllSteps()) {
+        return;
+    }
+    
+    const submitBtn = document.querySelector('#submit-signup');
+    setButtonLoading(submitBtn, true);
+    
+    try {
+        const result = await registerUser(userData.email, userData.password, userData);
+        
+        if (result.success) {
+            // Show success message
+            showFeedback(document.getElementById('signup-success'), 'Account created successfully! Redirecting to login...', 'success');
+            
+            // Redirect to login page after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        } else {
+            setButtonLoading(submitBtn, false);
+            showError(result.error || 'Failed to create account. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error during signup:', error);
+        setButtonLoading(submitBtn, false);
+        showError('An unexpected error occurred. Please try again later.');
+    }
+}
+
+// Initialize event listeners
+function initializeEventListeners() {
+    // Username validation on input
+    usernameInput.addEventListener('input', debounce(function() {
+        if (usernameInput.value.trim().length >= 3) {
+            validateUsername();
+        }
+    }, 500));
+    
+    // Username validation on blur
+    usernameInput.addEventListener('blur', function() {
+        if (usernameInput.value.trim()) {
+            validateUsername();
+        }
+    });
+    
+    // Email validation
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('blur', function() {
+        const email = emailInput.value.trim();
+        const emailFeedback = document.getElementById('email-feedback');
+        
+        if (!email) {
+            showFeedback(emailFeedback, 'Email is required', 'error');
+            return;
+        }
+        
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showFeedback(emailFeedback, 'Please enter a valid email address', 'error');
+            return;
+        }
+        
+        showFeedback(emailFeedback, 'Email format is valid', 'success');
+        userData.email = email;
+    });
+    
+    // Password strength meter
+    const passwordInput = document.getElementById('password');
+    passwordInput.addEventListener('input', function() {
+        updatePasswordStrength(this.value);
+    });
+    
+    passwordInput.addEventListener('focus', function() {
+        document.querySelector('.password-requirements').classList.add('active');
+    });
+    
+    passwordInput.addEventListener('blur', function() {
+        if (!this.value) {
+            document.querySelector('.password-requirements').classList.remove('active');
+        }
+        
+        // Store password if valid
+        const strength = updatePasswordStrength(this.value);
+        if (strength >= 3) {
+            userData.password = this.value;
+        }
+    });
+    
+    // Password match validation
+    const confirmPasswordInput = document.getElementById('confirm-password');
+    const passwordMatchIndicator = document.querySelector('.password-match-indicator');
+    
+    confirmPasswordInput.addEventListener('input', function() {
+        const password = passwordInput.value;
+        const confirmPassword = this.value;
+        
+        if (confirmPassword) {
+            passwordMatchIndicator.classList.add('visible');
+            
+            if (password === confirmPassword) {
+                passwordMatchIndicator.classList.add('match');
+                passwordMatchIndicator.innerHTML = '<i class="fas fa-check-circle"></i> Passwords match';
+            } else {
+                passwordMatchIndicator.classList.remove('match');
+                passwordMatchIndicator.innerHTML = '<i class="fas fa-times-circle"></i> Passwords do not match';
+            }
+        } else {
+            passwordMatchIndicator.classList.remove('visible');
+        }
+    });
+    
+    // Password visibility toggle
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const input = this.closest('.input-with-icon').querySelector('input');
+            const icon = this.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        });
+    });
+    
+    // Step navigation
+    nextBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const currentStep = parseInt(this.closest('.step-card').id.split('-')[1]);
+            goToStep(currentStep + 1);
+        });
+    });
+    
+    prevBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const currentStep = parseInt(this.closest('.step-card').id.split('-')[1]);
+            goToStep(currentStep - 1);
+        });
+    });
+    
+    // Form submission
+    signupForm.addEventListener('submit', submitSignup);
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initializeAvatarSelection();
+    initializeEventListeners();
+    initializeInterestTags();
+}); 

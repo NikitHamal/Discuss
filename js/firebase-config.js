@@ -1,4 +1,4 @@
-// Firebase configuration for compat version
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAxXNJPvvnxhZafQHOf6xGD-MVfCNg8zDE",
   authDomain: "storm-threads.firebaseapp.com",
@@ -10,15 +10,65 @@ const firebaseConfig = {
   measurementId: "G-KTTDW9EE88"
 };
 
-// Get the global firebase object from the window
-const firebase = window.firebase;
+// Create dummy implementations in case Firebase isn't loaded
+const dummyAuth = {
+  currentUser: null,
+  onAuthStateChanged: (callback) => callback(null)
+};
 
-// Initialize Firebase with compat version
-firebase.initializeApp(firebaseConfig);
+const dummyFirestore = {
+  collection: () => ({
+    doc: () => ({
+      get: async () => ({ exists: false, data: () => ({}) }),
+      set: async () => {},
+      update: async () => {}
+    }),
+    where: () => ({ get: async () => ({ empty: true, docs: [] }) })
+  })
+};
 
-// Export the firebase services
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
+const dummyStorage = {
+  ref: () => ({
+    put: async () => ({ ref: { getDownloadURL: async () => '' } })
+  })
+};
 
-export { firebase, auth, db, storage }; 
+// Variables for export
+let firebase, auth, db, storage;
+
+// Check if Firebase is available from the global scope
+if (typeof window !== 'undefined' && window.firebase) {
+  firebase = window.firebase;
+  
+  try {
+    // Initialize Firebase if not already initialized
+    if (!firebase.apps || !firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    
+    // Set Firebase services
+    auth = firebase.auth();
+    db = firebase.firestore();
+    storage = firebase.storage();
+    
+    console.log('Firebase initialized successfully!');
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+    
+    // Use dummy implementations in case of error
+    auth = dummyAuth;
+    db = dummyFirestore;
+    storage = dummyStorage;
+  }
+} else {
+  console.error('Firebase SDK not loaded! Make sure the Firebase SDK scripts are included in your HTML before this script.');
+  
+  // Use dummy implementations when Firebase is not available
+  firebase = null;
+  auth = dummyAuth;
+  db = dummyFirestore;
+  storage = dummyStorage;
+}
+
+// Export the services
+export { firebase, auth, db, storage };

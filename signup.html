@@ -63,8 +63,9 @@
                     <div class="progress-step" data-step="4" data-label="Finish">4</div>
                 </div>
                 
-                <!-- Error Message -->
+                <!-- Message Containers -->
                 <div id="signup-error" class="auth-error" role="alert"></div>
+                <div id="signup-success" class="auth-success" role="alert"></div>
                 
                 <!-- Multi-step Form -->
                 <form id="signup-form" class="auth-form">
@@ -164,19 +165,84 @@
                         </div>
                         
                         <div class="avatar-section">
-                            <label for="file-input">Profile Picture</label>
-                            <img id="avatar-preview" class="avatar-preview" style="display: none;" alt="Profile Preview">
+                            <label>Profile Picture (Optional)</label>
                             
-                            <div class="avatar-options">
-                                <div id="custom-file-upload" class="avatar-upload-btn" tabindex="0" role="button" aria-controls="file-input">
-                                    <i class="fas fa-cloud-upload-alt"></i> Upload a photo
+                            <div class="avatar-selection-container">
+                                <!-- Left side: Preview -->
+                                <div class="avatar-preview-container">
+                                    <img id="avatar-preview" class="avatar-preview" src="https://ui-avatars.com/api/?name=User&background=087ea4&color=fff&size=128" alt="Profile Preview">
+                                    <div class="avatar-preview-text">Preview</div>
                                 </div>
-                                <input type="file" id="file-input" class="file-input" accept="image/*" aria-label="Upload profile picture">
                                 
-                                <div>
-                                    <p>Or choose from our default avatars:</p>
-                                    <div id="default-avatars" class="default-avatars" role="radiogroup" aria-label="Default profile pictures"></div>
+                                <!-- Right side: Options -->
+                                <div class="avatar-selection-options">
+                                    <!-- Upload button -->
+                                    <div class="avatar-upload-wrapper">
+                                        <div id="custom-file-upload" class="avatar-upload-btn" tabindex="0" role="button" aria-controls="file-input">
+                                            <i class="fas fa-cloud-upload-alt"></i> Upload a photo
+                                        </div>
+                                        <input type="file" id="file-input" class="file-input" accept="image/*" aria-label="Upload profile picture">
+                                        <p class="avatar-upload-help">Max size: 5MB. Recommended: Square image.</p>
+                                    </div>
+                                    
+                                    <!-- Skip option -->
+                                    <div class="avatar-skip-option">
+                                        <button type="button" id="skip-avatar" class="avatar-skip-btn">
+                                            <i class="fas fa-times-circle"></i> Skip for now
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
+                            
+                            <!-- Default avatars section -->
+                            <div class="default-avatars-section">
+                                <h4>Or choose a default avatar:</h4>
+                                <div id="default-avatars" class="default-avatars" role="radiogroup" aria-label="Default profile pictures"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">
+                                Bio 
+                                <div class="help-tooltip">
+                                    <i class="fas fa-question-circle help-icon"></i>
+                                    <span class="tooltip-text">Tell others about yourself - your interests, background, or what you hope to share on Storm Write</span>
+                                </div>
+                                <button type="button" class="preview-toggle">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                            </label>
+                            <div class="textarea-container">
+                                <textarea id="bio" placeholder="Tell us a bit about yourself (e.g., 'Philosophy enthusiast focusing on ethics and free will')" rows="3" maxlength="300"></textarea>
+                                <div class="char-counter"><span id="bio-char-count">0</span>/300</div>
+                            </div>
+                            <div class="bio-preview">
+                                <p class="preview-title">Preview:</p>
+                                <div id="bio-preview-content"></div>
+                            </div>
+                            <div class="bio-tags">
+                                <span class="bio-tag" data-tag="Writer">Writer</span>
+                                <span class="bio-tag" data-tag="Philosopher">Philosopher</span>
+                                <span class="bio-tag" data-tag="Student">Student</span>
+                                <span class="bio-tag" data-tag="Teacher">Teacher</span>
+                                <span class="bio-tag" data-tag="Researcher">Researcher</span>
+                                <span class="bio-tag" data-tag="Thinker">Thinker</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="education">Education (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                                <input type="text" id="education" placeholder="e.g., PhD Candidate in Philosophy">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="institution">Institution (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-university"></i>
+                                <input type="text" id="institution" placeholder="e.g., University of Philosophy">
                             </div>
                         </div>
                         
@@ -212,31 +278,10 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="bio">
-                                Bio (Optional) 
-                                <div class="help-tooltip">
-                                    <i class="fas fa-question-circle help-icon"></i>
-                                    <span class="tooltip-text">Tell others about yourself - your interests, background, or what you hope to share on Storm Write</span>
-                                </div>
-                                <button type="button" class="preview-toggle">
-                                    <i class="fas fa-eye"></i> Preview
-                                </button>
-                            </label>
-                            <div class="textarea-container">
-                                <textarea id="bio" placeholder="Tell us a bit about yourself" rows="3" maxlength="300"></textarea>
-                                <div class="char-counter"><span id="bio-char-count">0</span>/300</div>
-                            </div>
-                            <div class="bio-preview">
-                                <p class="preview-title">Preview:</p>
-                                <div id="bio-preview-content"></div>
-                            </div>
-                            <div class="bio-tags">
-                                <span class="bio-tag" data-tag="Writer">Writer</span>
-                                <span class="bio-tag" data-tag="Philosopher">Philosopher</span>
-                                <span class="bio-tag" data-tag="Student">Student</span>
-                                <span class="bio-tag" data-tag="Teacher">Teacher</span>
-                                <span class="bio-tag" data-tag="Researcher">Researcher</span>
-                                <span class="bio-tag" data-tag="Thinker">Thinker</span>
+                            <label for="website">Website (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-link"></i>
+                                <input type="url" id="website" placeholder="https://yourwebsite.com">
                             </div>
                         </div>
                         
@@ -379,9 +424,16 @@
         </div>
     </footer>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+
     <!-- JavaScript -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/navbar.js"></script>
     <script type="module" src="js/signup.js"></script>
 </body>
 </html> 
+
