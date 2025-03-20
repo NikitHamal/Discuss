@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- W3.CSS for icons -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html">Discover</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h2>Create Your Account</h2>
+                    <p>Join our thoughtful community</p>
+                </div>
+                <form class="auth-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="username" placeholder="Choose a unique username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="Enter your email address">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Create a strong password">
+                            <button type="button" class="password-toggle">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="confirm-password" placeholder="Confirm your password">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group interests">
+                        <label>Areas of Interest (choose at least 3)</label>
+                        <div class="interest-tags">
+                            <div class="interest-tag">
+                                <input type="checkbox" id="philosophy" name="interests" value="philosophy">
+                                <label for="philosophy">Philosophy</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="religion" name="interests" value="religion">
+                                <label for="religion">Religion</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="spirituality" name="interests" value="spirituality">
+                                <label for="spirituality">Spirituality</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="ethics" name="interests" value="ethics">
+                                <label for="ethics">Ethics</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="metaphysics" name="interests" value="metaphysics">
+                                <label for="metaphysics">Metaphysics</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="existentialism" name="interests" value="existentialism">
+                                <label for="existentialism">Existentialism</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="consciousness" name="interests" value="consciousness">
+                                <label for="consciousness">Consciousness</label>
+                            </div>
+                            <div class="interest-tag">
+                                <input type="checkbox" id="meditation" name="interests" value="meditation">
+                                <label for="meditation">Meditation</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="terms" required>
+                            <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="auth-button">Create Account</button>
+                    <div class="auth-separator">
+                        <span>OR</span>
+                    </div>
+                    <div class="social-login">
+                        <button type="button" class="social-btn google">
+                            <i class="fab fa-google"></i> Continue with Google
+                        </button>
+                        <button type="button" class="social-btn facebook">
+                            <i class="fab fa-facebook-f"></i> Continue with Facebook
+                        </button>
+                        <button type="button" class="social-btn twitter">
+                            <i class="fab fa-twitter"></i> Continue with Twitter
+                        </button>
+                    </div>
+                </form>
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="login.html">Login</a></p>
+                </div>
+            </div>
+            <div class="auth-info">
+                <div class="auth-info-content">
+                    <h2>Why Join Storm Write?</h2>
+                    <p>Create an account to become part of a vibrant community dedicated to thoughtful discussion and intellectual exploration.</p>
+                    <ul class="auth-benefits">
+                        <li><i class="fas fa-check-circle"></i> Participate in deep philosophical conversations</li>
+                        <li><i class="fas fa-check-circle"></i> Follow topics that interest you</li>
+                        <li><i class="fas fa-check-circle"></i> Build your reputation through quality contributions</li>
+                        <li><i class="fas fa-check-circle"></i> Connect with other philosophical minds</li>
+                        <li><i class="fas fa-check-circle"></i> Receive personalized recommendations</li>
+                    </ul>
+                    <div class="auth-testimonial">
+                        <p>"The depth of conversations here is unmatched. I've found a community that truly values thoughtful dialogue over quick reactions."</p>
+                        <div class="testimonial-author">
+                            <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=16a34a&color=fff&size=48" alt="Michael Chen">
+                            <div>
+                                <h4>Michael Chen</h4>
+                                <p>Comparative Religion Scholar</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer auth-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2023 Storm Write. All rights reserved.</p>
+                <div class="footer-links-minimal">
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Help Center</a>
+                    <a href="about.html">About</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+    <script>
+        // Password visibility toggle
+        document.querySelector('.password-toggle').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
+        // Form validation
+        document.querySelector('.auth-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const interests = document.querySelectorAll('input[name="interests"]:checked');
+            
+            // Simple validation
+            if (!username || !email || !password || !confirmPassword) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (interests.length < 3) {
+                alert('Please select at least 3 areas of interest');
+                return;
+            }
+            
+            // In a real app, send this to server
+            console.log('Form submitted successfully');
+            
+            // Redirect to home page or verification page
+            // window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html> 

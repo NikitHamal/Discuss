@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Post - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/write.css">
+</head>
+<body class="write-body">
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html">Discover</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                        <li><a href="#">Notifications</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="location.href='login.html'">Login</button>
+                    <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="topics.html">Discover</a>
+            <a href="topics.html">Topics</a>
+            <a href="#">Notifications</a>
+            <a href="profile.html">Profile</a>
+        </nav>
+        <div class="mobile-menu-buttons">
+            <button class="login-btn" onclick="location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="breadcrumbs">
+                <a href="index.html">Home</a> 
+                <i class="fas fa-chevron-right"></i> 
+                <span>Create Post</span>
+            </div>
+            
+            <div class="write-container">
+                <div class="write-main">
+                    <div class="write-card">
+                        <h2 class="section-title">Create New Post</h2>
+                        
+                        <form class="post-form">
+                            <div class="form-group">
+                                <label for="post-title">Title</label>
+                                <input type="text" id="post-title" placeholder="Enter a descriptive title..." required>
+                                <div class="form-hint">A clear title helps others find and understand your post</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="post-topic">Topic</label>
+                                <div class="select-wrapper">
+                                    <select id="post-topic" required>
+                                        <option value="" disabled selected>Select a topic</option>
+                                        <option value="philosophy">Philosophy</option>
+                                        <option value="technology">Technology</option>
+                                        <option value="science">Science</option>
+                                        <option value="psychology">Psychology</option>
+                                        <option value="art">Art & Culture</option>
+                                        <option value="politics">Politics</option>
+                                        <option value="spirituality">Spirituality</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down select-arrow"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="formatting-label">Formatting</label>
+                                <div class="formatting-toolbar">
+                                    <div class="format-group">
+                                        <button type="button" class="format-btn" title="Bold" data-format="bold"><i class="fas fa-bold"></i></button>
+                                        <button type="button" class="format-btn" title="Italic" data-format="italic"><i class="fas fa-italic"></i></button>
+                                        <button type="button" class="format-btn" title="Underline" data-format="underline"><i class="fas fa-underline"></i></button>
+                                    </div>
+                                    <div class="format-group">
+                                        <button type="button" class="format-btn" title="Heading" data-format="heading"><i class="fas fa-heading"></i></button>
+                                        <button type="button" class="format-btn" title="Quote" data-format="quote"><i class="fas fa-quote-left"></i></button>
+                                        <button type="button" class="format-btn" title="Code" data-format="code"><i class="fas fa-code"></i></button>
+                                    </div>
+                                    <div class="format-group">
+                                        <button type="button" class="format-btn" title="Numbered List" data-format="ordered-list"><i class="fas fa-list-ol"></i></button>
+                                        <button type="button" class="format-btn" title="Bullet List" data-format="unordered-list"><i class="fas fa-list-ul"></i></button>
+                                    </div>
+                                    <div class="format-group">
+                                        <button type="button" class="format-btn" title="Link" data-format="link"><i class="fas fa-link"></i></button>
+                                        <button type="button" class="format-btn" title="Image" data-format="image"><i class="fas fa-image"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="post-content">Content</label>
+                                <textarea id="post-content" rows="12" placeholder="Share your thoughts..." required></textarea>
+                                <div class="editor-word-count">0 words</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="post-tags">Tags</label>
+                                <div class="tags-input-container">
+                                    <input type="text" id="post-tags" placeholder="Add tags separated by commas">
+                                    <div class="tags-display"></div>
+                                </div>
+                                <div class="form-hint">Tags help others find your post. Add up to 5 relevant tags.</div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <span class="draft-status"><i class="fas fa-save"></i> Draft saved</span>
+                                <div class="action-buttons">
+                                    <button type="button" class="cancel-btn">Cancel</button>
+                                    <button type="submit" class="publish-btn"><i class="fas fa-paper-plane"></i> Publish Post</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="write-sidebar">
+                    <div class="sidebar-card writing-tips">
+                        <h3 class="card-title"><i class="fas fa-lightbulb"></i> Writing Tips</h3>
+                        <ul class="guidelines-list">
+                            <li><i class="fas fa-check"></i> Be respectful and constructive</li>
+                            <li><i class="fas fa-check"></i> Provide sources for facts when possible</li>
+                            <li><i class="fas fa-check"></i> Keep titles clear and descriptive</li>
+                            <li><i class="fas fa-check"></i> Use proper formatting for readability</li>
+                            <li><i class="fas fa-check"></i> Focus on one main question or topic</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="sidebar-card">
+                        <h3 class="card-title"><i class="fas fa-fire"></i> Popular Tags</h3>
+                        <div class="popular-tags">
+                            <span class="tag-item">#philosophy</span>
+                            <span class="tag-item">#consciousness</span>
+                            <span class="tag-item">#ethics</span>
+                            <span class="tag-item">#spirituality</span>
+                            <span class="tag-item">#meditation</span>
+                            <span class="tag-item">#religion</span>
+                            <span class="tag-item">#mindfulness</span>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-card preview-card">
+                        <h3 class="card-title"><i class="fas fa-eye"></i> Post Preview</h3>
+                        <p class="preview-info">As you write, a preview of your post will appear here.</p>
+                        <div class="post-preview">
+                            <h4 class="preview-title">Your post title will appear here</h4>
+                            <div class="preview-content"></div>
+                        </div>
+                        <button class="preview-btn"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const mainNav = document.querySelector('.main-nav');
+            
+            menuToggle.addEventListener('click', function() {
+                mainNav.classList.toggle('show');
+            });
+            
+            // Format buttons functionality
+            const formatButtons = document.querySelectorAll('.format-btn');
+            const contentTextarea = document.getElementById('post-content');
+            const previewContent = document.querySelector('.preview-content');
+            const previewTitle = document.querySelector('.preview-title');
+            const titleInput = document.getElementById('post-title');
+            const wordCountDisplay = document.querySelector('.editor-word-count');
+            
+            // Update word count
+            function updateWordCount() {
+                const text = contentTextarea.value.trim();
+                const wordCount = text ? text.split(/\s+/).length : 0;
+                wordCountDisplay.textContent = `${wordCount} word${wordCount !== 1 ? 's' : ''}`;
+            }
+            
+            contentTextarea.addEventListener('input', updateWordCount);
+            
+            // Handle title preview
+            titleInput.addEventListener('input', function() {
+                previewTitle.textContent = this.value || 'Your post title will appear here';
+            });
+            
+            // Format buttons functionality
+            formatButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const formatType = this.getAttribute('data-format');
+                    let startTag = '';
+                    let endTag = '';
+                    
+                    switch(formatType) {
+                        case 'bold':
+                            startTag = '**';
+                            endTag = '**';
+                            break;
+                        case 'italic':
+                            startTag = '*';
+                            endTag = '*';
+                            break;
+                        case 'underline':
+                            startTag = '__';
+                            endTag = '__';
+                            break;
+                        case 'heading':
+                            startTag = '## ';
+                            endTag = '';
+                            break;
+                        case 'quote':
+                            startTag = '> ';
+                            endTag = '';
+                            break;
+                        case 'code':
+                            startTag = '```\n';
+                            endTag = '\n```';
+                            break;
+                        case 'ordered-list':
+                            startTag = '1. ';
+                            endTag = '';
+                            break;
+                        case 'unordered-list':
+                            startTag = '- ';
+                            endTag = '';
+                            break;
+                        case 'link':
+                            startTag = '[';
+                            endTag = '](url)';
+                            break;
+                        case 'image':
+                            startTag = '![alt text](';
+                            endTag = ')';
+                            break;
+                    }
+                    
+                    // Visual feedback
+                    this.classList.add('format-btn-active');
+                    setTimeout(() => {
+                        this.classList.remove('format-btn-active');
+                    }, 300);
+                    
+                    // Insert formatting tags
+                    const selectionStart = contentTextarea.selectionStart;
+                    const selectionEnd = contentTextarea.selectionEnd;
+                    const selectedText = contentTextarea.value.substring(selectionStart, selectionEnd);
+                    const replacement = startTag + selectedText + endTag;
+                    
+                    contentTextarea.value = contentTextarea.value.substring(0, selectionStart) 
+                                          + replacement 
+                                          + contentTextarea.value.substring(selectionEnd);
+                                          
+                    // Reset focus and selection
+                    contentTextarea.focus();
+                    contentTextarea.setSelectionRange(
+                        selectionStart + startTag.length, 
+                        selectionStart + startTag.length + selectedText.length
+                    );
+                    
+                    // Update word count
+                    updateWordCount();
+                    
+                    // Update preview on format change
+                    updatePreview();
+                });
+            });
+            
+            // Preview functionality
+            function updatePreview() {
+                // Simple conversion of markdown-like syntax to HTML
+                let content = contentTextarea.value;
+                
+                // Bold
+                content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                
+                // Italic
+                content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                
+                // Underline
+                content = content.replace(/__(.*?)__/g, '<u>$1</u>');
+                
+                // Headings
+                content = content.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+                
+                // Quote
+                content = content.replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>');
+                
+                // Lists
+                content = content.replace(/^- (.*?)$/gm, '<li>$1</li>');
+                content = content.replace(/^1\. (.*?)$/gm, '<li>$1</li>');
+                
+                // Add paragraph breaks
+                content = content.replace(/\n\n/g, '</p><p>');
+                
+                // Wrap in paragraph
+                content = '<p>' + content + '</p>';
+                
+                previewContent.innerHTML = content;
+            }
+            
+            contentTextarea.addEventListener('input', updatePreview);
+            document.querySelector('.preview-btn').addEventListener('click', updatePreview);
+            
+            // Tags functionality
+            const tagsInput = document.getElementById('post-tags');
+            const tagsDisplay = document.querySelector('.tags-display');
+            const currentTags = new Set();
+            
+            function updateTagsDisplay() {
+                tagsDisplay.innerHTML = '';
+                currentTags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'tag-bubble';
+                    tagElement.innerHTML = `${tag} <i class="fas fa-times tag-remove" data-tag="${tag}"></i>`;
+                    tagsDisplay.appendChild(tagElement);
+                });
+                
+                // Enable/disable tag input based on number of tags
+                if (currentTags.size >= 5) {
+                    tagsInput.disabled = true;
+                    tagsInput.placeholder = "Maximum tags reached";
+                } else {
+                    tagsInput.disabled = false;
+                    tagsInput.placeholder = "Add tags separated by commas";
+                }
+            }
+            
+            tagsInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    
+                    const tagText = this.value.trim().replace(/,/g, '');
+                    if (tagText && currentTags.size < 5) {
+                        currentTags.add(tagText);
+                        this.value = '';
+                        updateTagsDisplay();
+                    }
+                }
+            });
+            
+            // Remove tags when clicking x
+            tagsDisplay.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tag-remove')) {
+                    const tagToRemove = e.target.getAttribute('data-tag');
+                    currentTags.delete(tagToRemove);
+                    updateTagsDisplay();
+                    
+                    // Re-enable the input if we're below max tags
+                    if (currentTags.size < 5) {
+                        tagsInput.disabled = false;
+                        tagsInput.placeholder = "Add tags separated by commas";
+                    }
+                }
+            });
+            
+            // Simulate draft saving with visual feedback
+            function saveDraft() {
+                const draftStatus = document.querySelector('.draft-status');
+                draftStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                setTimeout(() => {
+                    draftStatus.innerHTML = '<i class="fas fa-check-circle"></i> Draft saved';
+                    setTimeout(() => {
+                        draftStatus.innerHTML = '<i class="fas fa-save"></i> Draft saved';
+                    }, 2000);
+                }, 1000);
+            }
+            
+            // Save draft periodically and on changes
+            let draftTimer;
+            function startDraftTimer() {
+                clearTimeout(draftTimer);
+                draftTimer = setTimeout(saveDraft, 2000);
+            }
+            
+            contentTextarea.addEventListener('input', startDraftTimer);
+            titleInput.addEventListener('input', startDraftTimer);
+            
+            // Initial save
+            setTimeout(saveDraft, 3000);
+            
+            // Cancel button action
+            document.querySelector('.cancel-btn').addEventListener('click', function() {
+                if(confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+                    window.location.href = 'index.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

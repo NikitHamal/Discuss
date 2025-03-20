@@ -1,0 +1,387 @@
+/* Topics Page Header */
+.page-header {
+    text-align: center;
+    margin: 2rem 0;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.page-header h1 {
+    font-size: 2.4rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    color: var(--secondary-text-color);
+    font-size: 1.1rem;
+}
+
+/* Search and Filter */
+.topics-search-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    flex: 1;
+    position: relative;
+    min-width: 250px;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 0.8rem 1rem 0.8rem 2.5rem;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    background-color: var(--input-bg);
+}
+
+.search-bar input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(8, 126, 164, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--secondary-text-color);
+}
+
+.topics-filter {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.topics-filter select {
+    padding: 0.7rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.topics-filter select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* Featured Topics Grid */
+.featured-topics {
+    margin-bottom: 3rem;
+}
+
+.featured-topics h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.featured-topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.featured-topic-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    background-color: var(--card-bg);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.featured-topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.featured-topic-header {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.featured-icon {
+    font-size: 3rem;
+}
+
+.featured-topic-content {
+    padding: 1.5rem;
+}
+
+.featured-topic-content h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}
+
+.featured-topic-content p {
+    color: var(--secondary-text-color);
+    margin-bottom: 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.topic-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--secondary-text-color);
+}
+
+.topic-explore-btn {
+    display: block;
+    text-align: center;
+    padding: 0.7rem;
+    border-radius: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.topic-explore-btn:hover {
+    background-color: #065d7a; /* Darker than primary color for better distinction */
+    text-decoration: none;
+}
+
+/* All Topics Grid */
+.all-topics {
+    margin-bottom: 3rem;
+}
+
+.all-topics h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.topic-card {
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.25rem;
+    background-color: var(--card-bg);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.topic-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+    border-color: rgba(8, 126, 164, 0.3); /* Slightly visible primary color border on hover */
+}
+
+.topic-card-header {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.topic-card-header h3 {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.topic-category {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    background-color: var(--primary-color-light);
+    color: var(--primary-color);
+}
+
+.topic-category.philosophy {
+    background-color: rgba(8, 126, 164, 0.1);
+    color: #087ea4;
+}
+
+.topic-category.religion {
+    background-color: rgba(22, 163, 74, 0.1);
+    color: #16a34a;
+}
+
+.topic-category.spirituality {
+    background-color: rgba(109, 40, 217, 0.1);
+    color: #6d28d9;
+}
+
+.topic-card-body {
+    margin-bottom: 1rem;
+}
+
+.topic-card-body p {
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+    line-height: 1.5;
+}
+
+.topic-card-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+    color: var(--secondary-text-color);
+}
+
+.topic-stat i {
+    margin-right: 0.5rem;
+    width: 16px;
+    text-align: center;
+}
+
+.topic-card-footer {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.topic-join-btn, .topic-view-btn {
+    flex: 1;
+    padding: 0.6rem 0;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.topic-join-btn {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.topic-join-btn:hover {
+    background-color: #065d7a; /* Darker than primary color */
+    text-decoration: none;
+}
+
+.topic-view-btn {
+    background-color: #f0f0f0; /* Light gray background instead of variable */
+    color: var(--text-color);
+    border: 1px solid #e0e0e0; /* Adding visible border */
+}
+
+.topic-view-btn:hover {
+    background-color: #e5e5e5; /* Slightly darker gray for hover */
+    text-decoration: none;
+}
+
+/* Create New Topic Section */
+.create-topic-section {
+    margin-bottom: 2rem;
+}
+
+.create-topic-container {
+    background: linear-gradient(to right, rgba(8, 126, 164, 0.15), rgba(109, 40, 217, 0.1));
+    border-radius: 12px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.create-topic-content {
+    flex: 2;
+}
+
+.create-topic-content h2 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.create-topic-content p {
+    color: var(--secondary-text-color);
+    margin-bottom: 1.5rem;
+    max-width: 80%;
+}
+
+.create-topic-btn {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-topic-btn:hover {
+    background-color: #065d7a; /* Darker than primary color */
+}
+
+.create-topic-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-topic-image i {
+    font-size: 5rem;
+    color: var(--primary-color);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .topics-search-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .topics-filter {
+        flex-direction: column;
+    }
+    
+    .featured-topics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .topics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .create-topic-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+    
+    .create-topic-content p {
+        max-width: 100%;
+    }
+} 

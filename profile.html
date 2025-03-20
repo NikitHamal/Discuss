@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhilosophyFan - Profile - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- W3.CSS for icons -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/profile.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html">Discover</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                        <li><a href="#">Notifications</a></li>
+                        <li><a href="profile.html" class="active">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="location.href='login.html'">Login</button>
+                    <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="topics.html">Discover</a>
+            <a href="topics.html">Topics</a>
+            <a href="#">Notifications</a>
+            <a href="profile.html" class="active">Profile</a>
+        </nav>
+        <div class="mobile-menu-buttons">
+            <button class="login-btn" onclick="location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <div class="profile-cover">
+                    <img src="https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80" alt="Cover Image">
+                </div>
+                <div class="profile-header-content">
+                    <div class="profile-avatar">
+                        <img src="https://ui-avatars.com/api/?name=PhilosophyFan&background=087ea4&color=fff&size=128" alt="User Avatar">
+                    </div>
+                    <div class="profile-info">
+                        <div class="profile-name-container">
+                            <h1 class="profile-name">PhilosophyFan</h1>
+                            <span class="profile-badge verified"><i class="fas fa-check-circle"></i> Verified</span>
+                            <span class="profile-badge premium"><i class="fas fa-award"></i> Premium</span>
+                        </div>
+                        <p class="profile-bio">Philosophy enthusiast focusing on ethics and free will. Graduate student at University of Philosophy.</p>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <span class="stat-value">128</span>
+                                <span class="stat-label">Discussions</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">4.2k</span>
+                                <span class="stat-label">Reputation</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">836</span>
+                                <span class="stat-label">Comments</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">Jan 2022</span>
+                                <span class="stat-label">Joined</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-actions">
+                        <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                        <button class="message-btn"><i class="fas fa-envelope"></i> Message</button>
+                        <div class="profile-more-actions">
+                            <button class="more-actions-btn"><i class="fas fa-ellipsis-h"></i></button>
+                            <div class="actions-dropdown">
+                                <a href="#"><i class="fas fa-flag"></i> Report User</a>
+                                <a href="#"><i class="fas fa-ban"></i> Block User</a>
+                                <a href="#"><i class="fas fa-share-alt"></i> Share Profile</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="profile-content">
+                <div class="profile-nav">
+                    <ul class="profile-tabs">
+                        <li><a href="#" class="active">Discussions</a></li>
+                        <li><a href="#">Comments</a></li>
+                        <li><a href="#">Saved</a></li>
+                        <li><a href="#">Upvoted</a></li>
+                        <li><a href="#">About</a></li>
+                    </ul>
+                </div>
+                
+                <div class="profile-tab-content">
+                    <!-- Discussions Tab (Active by default) -->
+                    <div class="tab-section discussions-tab active">
+                        <div class="profile-filter">
+                            <select>
+                                <option>Sort by: Recent</option>
+                                <option>Most Upvoted</option>
+                                <option>Most Commented</option>
+                                <option>Oldest</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Posts/Discussions List -->
+                        <div class="posts-list">
+                            <!-- Post Item 1 -->
+                            <div class="post-item">
+                                <div class="vote-controls">
+                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <span class="vote-count">125</span>
+                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                </div>
+                                <div class="post-content">
+                                    <div class="post-header">
+                                        <div class="post-meta">
+                                            <a href="#" class="post-category">Philosophy</a>
+                                            <span class="post-time">2 hours ago</span>
+                                        </div>
+                                        <h3 class="post-title"><a href="post-detail.html">The concept of free will in modern society - Are we truly free to make our own choices?</a></h3>
+                                    </div>
+                                    <div class="post-body">
+                                        <p>In today's interconnected world, how much of our decisions are truly our own? I've been contemplating the intersection of social media influence and personal autonomy...</p>
+                                    </div>
+                                    <div class="post-footer">
+                                        <div class="post-actions">
+                                            <a href="#" class="post-action"><i class="fas fa-comment-alt"></i> 42 Comments</a>
+                                            <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
+                                            <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post Item 2 -->
+                            <div class="post-item">
+                                <div class="vote-controls">
+                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <span class="vote-count">93</span>
+                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                </div>
+                                <div class="post-content">
+                                    <div class="post-header">
+                                        <div class="post-meta">
+                                            <a href="#" class="post-category">Ethics</a>
+                                            <span class="post-time">3 days ago</span>
+                                        </div>
+                                        <h3 class="post-title"><a href="#">The trolley problem revisited: Modern ethical dilemmas in automated systems</a></h3>
+                                    </div>
+                                    <div class="post-body">
+                                        <p>With the rise of self-driving vehicles and AI decision-making systems, the classic trolley problem has taken on new significance. How do we program machines to make ethical choices?</p>
+                                    </div>
+                                    <div class="post-footer">
+                                        <div class="post-actions">
+                                            <a href="#" class="post-action"><i class="fas fa-comment-alt"></i> 28 Comments</a>
+                                            <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
+                                            <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Post Item 3 -->
+                            <div class="post-item">
+                                <div class="vote-controls">
+                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <span class="vote-count">156</span>
+                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                </div>
+                                <div class="post-content">
+                                    <div class="post-header">
+                                        <div class="post-meta">
+                                            <a href="#" class="post-category">Existentialism</a>
+                                            <span class="post-time">1 week ago</span>
+                                        </div>
+                                        <h3 class="post-title"><a href="#">Finding meaning in a post-truth world: Existential challenges of the digital age</a></h3>
+                                    </div>
+                                    <div class="post-body">
+                                        <p>In an era where information is abundant but truth seems increasingly elusive, how do we construct meaning and authenticity in our lives? This discussion explores existential challenges in the digital age.</p>
+                                    </div>
+                                    <div class="post-footer">
+                                        <div class="post-actions">
+                                            <a href="#" class="post-action"><i class="fas fa-comment-alt"></i> 63 Comments</a>
+                                            <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
+                                            <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Pagination -->
+                        <div class="pagination">
+                            <a href="#" class="page-link prev"><i class="fas fa-chevron-left"></i></a>
+                            <a href="#" class="page-link active">1</a>
+                            <a href="#" class="page-link">2</a>
+                            <a href="#" class="page-link">3</a>
+                            <span class="page-ellipsis">...</span>
+                            <a href="#" class="page-link">9</a>
+                            <a href="#" class="page-link next"><i class="fas fa-chevron-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Sidebar (Additional info) -->
+    <aside class="profile-sidebar">
+        <div class="sidebar-card about-user">
+            <h3>About PhilosophyFan</h3>
+            <div class="about-item">
+                <i class="fas fa-university"></i>
+                <div>
+                    <h4>Education</h4>
+                    <p>PhD Candidate in Philosophy</p>
+                    <p>University of Philosophy</p>
+                </div>
+            </div>
+            <div class="about-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <h4>Location</h4>
+                    <p>New York, USA</p>
+                </div>
+            </div>
+            <div class="about-item">
+                <i class="fas fa-link"></i>
+                <div>
+                    <h4>Website</h4>
+                    <p><a href="#" target="_blank">philosophyfan.com</a></p>
+                </div>
+            </div>
+            <div class="about-item">
+                <i class="fas fa-calendar-alt"></i>
+                <div>
+                    <h4>Member Since</h4>
+                    <p>January 15, 2022</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-card user-topics">
+            <h3>Active in Topics</h3>
+            <ul class="user-topics-list">
+                <li>
+                    <a href="#">
+                        <span class="topic-name">Philosophy</span>
+                        <span class="topic-count">47 discussions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="topic-name">Ethics</span>
+                        <span class="topic-count">32 discussions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="topic-name">Existentialism</span>
+                        <span class="topic-count">28 discussions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="topic-name">Consciousness Studies</span>
+                        <span class="topic-count">16 discussions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="topic-name">Political Philosophy</span>
+                        <span class="topic-count">5 discussions</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="sidebar-card user-achievements">
+            <h3>Achievements</h3>
+            <div class="achievement-grid">
+                <div class="achievement-item">
+                    <div class="achievement-icon gold">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span class="achievement-name">Top Contributor</span>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon silver">
+                        <i class="fas fa-pen-fancy"></i>
+                    </div>
+                    <span class="achievement-name">Prolific Writer</span>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon bronze">
+                        <i class="fas fa-comment"></i>
+                    </div>
+                    <span class="achievement-name">Insightful Commenter</span>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <span class="achievement-name">Appreciated</span>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <span class="achievement-name">1 Year Club</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Storm Write</h2>
+                    <p>Explore the depths of thought</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-column">
+                        <h3>Navigation</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="topics.html">Discover</a></li>
+                            <li><a href="topics.html">Topics</a></li>
+                            <li><a href="#">Popular Discussions</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="#">Community Guidelines</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Connect</h3>
+                        <ul>
+                            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                            <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                            <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
+                            <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Storm Write. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html> 

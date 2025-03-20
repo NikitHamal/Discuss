@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- W3.CSS for icons -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/topics.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html" class="active">Discover</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                        <li><a href="#">Notifications</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="location.href='login.html'">Login</button>
+                    <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="topics.html" class="active">Discover</a>
+            <a href="topics.html">Topics</a>
+            <a href="#">Notifications</a>
+            <a href="profile.html">Profile</a>
+        </nav>
+        <div class="mobile-menu-buttons">
+            <button class="login-btn" onclick="location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Explore Topics</h1>
+                <p>Discover communities centered around philosophical, religious, and spiritual discussions</p>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="topics-search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search for topics...">
+                </div>
+                <div class="topics-filter">
+                    <select>
+                        <option>All Categories</option>
+                        <option>Philosophy</option>
+                        <option>Religion</option>
+                        <option>Spirituality</option>
+                        <option>Ethics</option>
+                        <option>Metaphysics</option>
+                    </select>
+                    <select>
+                        <option>Sort by: Most Popular</option>
+                        <option>Newest</option>
+                        <option>Most Active</option>
+                        <option>Alphabetical</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Featured Topics -->
+            <section class="featured-topics">
+                <h2>Featured Topics</h2>
+                <div class="featured-topics-grid">
+                    <div class="featured-topic-card">
+                        <div class="featured-topic-header" style="background-color: var(--primary-color);">
+                            <i class="fas fa-brain featured-icon"></i>
+                        </div>
+                        <div class="featured-topic-content">
+                            <h3>Philosophy</h3>
+                            <p>Explore fundamental questions about knowledge, existence, reason, mind, and language.</p>
+                            <div class="topic-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">15.8k</span>
+                                    <span class="stat-label">Members</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">126</span>
+                                    <span class="stat-label">Online</span>
+                                </div>
+                            </div>
+                            <a href="#" class="topic-explore-btn">Explore</a>
+                        </div>
+                    </div>
+                    
+                    <div class="featured-topic-card">
+                        <div class="featured-topic-header" style="background-color: #6d28d9;">
+                            <i class="fas fa-pray featured-icon"></i>
+                        </div>
+                        <div class="featured-topic-content">
+                            <h3>Spirituality</h3>
+                            <p>Discuss personal growth, consciousness, meditation, and spiritual practices.</p>
+                            <div class="topic-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">12.3k</span>
+                                    <span class="stat-label">Members</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">98</span>
+                                    <span class="stat-label">Online</span>
+                                </div>
+                            </div>
+                            <a href="#" class="topic-explore-btn">Explore</a>
+                        </div>
+                    </div>
+                    
+                    <div class="featured-topic-card">
+                        <div class="featured-topic-header" style="background-color: #16a34a;">
+                            <i class="fas fa-place-of-worship featured-icon"></i>
+                        </div>
+                        <div class="featured-topic-content">
+                            <h3>Religion</h3>
+                            <p>Examine religious traditions, beliefs, practices, and their impact on societies throughout history.</p>
+                            <div class="topic-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value">10.5k</span>
+                                    <span class="stat-label">Members</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value">89</span>
+                                    <span class="stat-label">Online</span>
+                                </div>
+                            </div>
+                            <a href="#" class="topic-explore-btn">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- All Topics -->
+            <section class="all-topics">
+                <h2>All Topics</h2>
+                <div class="topics-grid">
+                    <!-- Topic Card 1 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Ethics</h3>
+                            <span class="topic-category philosophy">Philosophy</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Explore moral principles that govern behavior and the systematic study of right and wrong conduct.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 8.7k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 245 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 2 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Metaphysics</h3>
+                            <span class="topic-category philosophy">Philosophy</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Discuss the nature of reality, existence, being, time, space, and their fundamental principles.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 6.2k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 183 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 3 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Buddhism</h3>
+                            <span class="topic-category religion">Religion</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Explore Buddhist philosophy, practices, teachings, and their application in modern life.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 7.5k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 215 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 4 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Meditation</h3>
+                            <span class="topic-category spirituality">Spirituality</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Share techniques, experiences, and insights about mindfulness and meditation practices.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 9.3k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 267 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 5 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Consciousness</h3>
+                            <span class="topic-category philosophy">Philosophy</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Discuss the nature of consciousness, awareness, and the mind-body problem.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 7.1k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 198 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 6 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Christianity</h3>
+                            <span class="topic-category religion">Religion</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Discuss Christian theology, scripture interpretation, traditions, and contemporary issues.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 8.9k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 231 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 7 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Existentialism</h3>
+                            <span class="topic-category philosophy">Philosophy</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Explore philosophical ideas about individual existence, freedom, choice, and meaning in life.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 6.7k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 176 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Topic Card 8 -->
+                    <div class="topic-card">
+                        <div class="topic-card-header">
+                            <h3>Mysticism</h3>
+                            <span class="topic-category spirituality">Spirituality</span>
+                        </div>
+                        <div class="topic-card-body">
+                            <p>Discuss direct experience of ultimate reality, divinity, spiritual truth, or God.</p>
+                        </div>
+                        <div class="topic-card-stats">
+                            <div class="topic-stat"><i class="fas fa-users"></i> 5.4k members</div>
+                            <div class="topic-stat"><i class="fas fa-comment-alt"></i> 142 discussions</div>
+                        </div>
+                        <div class="topic-card-footer">
+                            <a href="#" class="topic-join-btn">Join</a>
+                            <a href="#" class="topic-view-btn">View</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <a href="#" class="page-link prev"><i class="fas fa-chevron-left"></i></a>
+                    <a href="#" class="page-link active">1</a>
+                    <a href="#" class="page-link">2</a>
+                    <a href="#" class="page-link">3</a>
+                    <span class="page-ellipsis">...</span>
+                    <a href="#" class="page-link">8</a>
+                    <a href="#" class="page-link next"><i class="fas fa-chevron-right"></i></a>
+                </div>
+            </section>
+            
+            <!-- Create New Topic -->
+            <section class="create-topic-section">
+                <div class="create-topic-container">
+                    <div class="create-topic-content">
+                        <h2>Can't find what you're looking for?</h2>
+                        <p>Create a new topic and build a community around your philosophical or spiritual interests.</p>
+                        <button class="create-topic-btn">Create New Topic</button>
+                    </div>
+                    <div class="create-topic-image">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Storm Write</h2>
+                    <p>Explore the depths of thought</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-column">
+                        <h3>Navigation</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="topics.html">Discover</a></li>
+                            <li><a href="topics.html">Topics</a></li>
+                            <li><a href="#">Popular Discussions</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="about.html">About Us</a></li>
+                            <li><a href="#">Community Guidelines</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Connect</h3>
+                        <ul>
+                            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
+                            <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                            <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
+                            <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Storm Write. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/main.js"></script>
+</body>
+</html> 
