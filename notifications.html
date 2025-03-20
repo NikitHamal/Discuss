@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- JavaScript -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/notifications.js"></script>
+    <style>
+        .notifications-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .notification-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .notification-tabs::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .notification-tab {
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            color: var(--text-color-light);
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .notification-tab:hover {
+            color: var(--primary-color);
+        }
+        
+        .notification-tab:before {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background-color: var(--primary-color-light);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+            opacity: 0;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+        }
+        
+        .notification-tab:hover:before {
+            width: 80%;
+            opacity: 0.6;
+        }
+
+        .notification-tab.active {
+            color: var(--primary-color);
+        }
+
+        .notification-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .notification-tab .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background-color: var(--background-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-left: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-item.unread {
+            background-color: rgba(var(--primary-rgb), 0.05);
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            margin: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 1; }
+            70% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(0.95); opacity: 1; }
+        }
+
+        .notification-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            background-color: var(--background-light);
+        }
+
+        .notification-avatar {
+            flex-shrink: 0;
+            margin-right: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-item:hover .notification-avatar {
+            transform: scale(1.05);
+        }
+
+        .notification-avatar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .notification-item.unread .notification-avatar img {
+            border-color: var(--primary-color);
+        }
+
+        .notification-content {
+            flex-grow: 1;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .notification-title .material-icons,
+        .notification-title i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            margin-left: 0.5rem;
+        }
+
+        .notification-body {
+            font-size: 0.95rem;
+            color: var(--text-color-light);
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+
+        .notification-post {
+            background-color: var(--background-light);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            margin-top: 0.75rem;
+            border-left: 3px solid var(--border-color);
+            transition: border-color 0.3s ease;
+        }
+
+        .notification-item:hover .notification-post {
+            border-left-color: var(--primary-color);
+        }
+
+        .notification-actions {
+            margin-top: 0.75rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .notification-action {
+            font-size: 0.85rem;
+            padding: 0.4rem 0.75rem;
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification-action i {
+            font-size: 1rem;
+            margin-right: 0.4rem;
+            transition: transform 0.3s ease;
+        }
+
+        .notification-action:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
+        }
+        
+        .notification-action:hover i {
+            transform: scale(1.2);
+        }
+        
+        .notification-action:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        /* Specific button styles */
+        .notification-action.mark-read:hover {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .notification-filters {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 0.75rem;
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn i {
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background-color: var(--background-light);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .filter-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        .notification-empty {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            background-color: var(--background-light);
+            border-radius: var(--radius);
+            display: none;
+        }
+
+        .notification-empty i {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: var(--border-color);
+        }
+
+        .notification-batch-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .batch-action-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-color);
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+        }
+
+        .batch-action-btn:hover {
+            background-color: var(--primary-color-light);
+        }
+
+        .batch-action-btn i {
+            font-size: 1.1rem;
+        }
+
+        .notification-status {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Animation effects */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification-item {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .notification-item:nth-child(1) { animation-delay: 0.05s; }
+        .notification-item:nth-child(2) { animation-delay: 0.1s; }
+        .notification-item:nth-child(3) { animation-delay: 0.15s; }
+        .notification-item:nth-child(4) { animation-delay: 0.2s; }
+        .notification-item:nth-child(5) { animation-delay: 0.25s; }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--text-color);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 10;
+            margin-bottom: 0.5rem;
+        }
+
+        .tooltip:hover::after {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--text-color) transparent transparent transparent;
+            margin-bottom: -5px;
+            z-index: 10;
+        }
+
+        /* Dark mode toggle for demo */
+        .dark-mode {
+            --background-color: #121212;
+            --background-light: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-color-light: #b0b0b0;
+            --border-color: #333;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Responsive fixes */
+        @media (max-width: 768px) {
+            .notification-tab {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .notification-title {
+                font-size: 0.95rem;
+            }
+            
+            .notification-avatar img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .notification-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .notification-action {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                        <li><a href="notifications.html" class="active">Notifications</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html">Settings</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="location.href='login.html'">Login</button>
+                    <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="material-icons">menu</i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="topics.html">Topics</a>
+            <a href="notifications.html" class="active">Notifications</a>
+            <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
+        </nav>
+        <div class="mobile-menu-buttons">
+            <button class="login-btn" onclick="location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <div class="page-header">
+                <h1>Notifications</h1>
+                <p>Stay updated with your activity and interactions</p>
+            </div>
+
+            <div class="notifications-container">
+                <!-- Notification Tabs -->
+                <div class="notification-tabs">
+                    <div class="notification-tab active" data-filter="all">All Notifications <span class="badge">7</span></div>
+                    <div class="notification-tab" data-filter="replies">Replies <span class="badge">2</span></div>
+                    <div class="notification-tab" data-filter="mentions">Mentions <span class="badge">1</span></div>
+                    <div class="notification-tab" data-filter="likes">Likes <span class="badge">3</span></div>
+                    <div class="notification-tab" data-filter="follows">Follows <span class="badge">1</span></div>
+                    <div class="notification-tab" data-filter="system">System</div>
+                </div>
+
+                <!-- Notification Batch Actions -->
+                <div class="notification-batch-actions">
+                    <div>
+                        <button class="batch-action-btn" id="markAllRead">
+                            <i class="material-icons">done_all</i> Mark all as read
+                        </button>
+                    </div>
+                    <div class="notification-status">You have <span id="unreadCount">3</span> unread notifications</div>
+                </div>
+
+                <!-- Notification Filters -->
+                <div class="notification-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="material-icons">all_inclusive</i> All
+                    </button>
+                    <button class="filter-btn" data-filter="unread">
+                        <i class="material-icons">mark_email_unread</i> Unread
+                    </button>
+                    <button class="filter-btn" data-filter="today">
+                        <i class="material-icons">today</i> Today
+                    </button>
+                    <button class="filter-btn" data-filter="week">
+                        <i class="material-icons">date_range</i> This Week
+                    </button>
+                    <button class="filter-btn" data-filter="month">
+                        <i class="material-icons">calendar_month</i> This Month
+                    </button>
+                </div>
+
+                <div class="notification-list">
+                    <!-- Reply Notification -->
+                    <div class="notification-item unread" data-type="replies" data-time="today">
+                        <div class="notification-avatar tooltip" data-tooltip="Sarah Johnson">
+                            <img src="https://ui-avatars.com/api/?name=Sarah+Johnson&background=16a34a&color=fff&size=128" alt="Sarah Johnson">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">comment</i> 
+                                    <span>Sarah Johnson replied to your post</span>
+                                </div>
+                                <div class="notification-time">2 hours ago</div>
+                            </div>
+                            <div class="notification-body">
+                                "This is such an insightful perspective. I particularly appreciate your take on the ethical implications of consciousness theory."
+                            </div>
+                            <div class="notification-post">
+                                Your post: "Exploring the relationship between consciousness and quantum mechanics..."
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">visibility</i> View
+                                </button>
+                                <button class="notification-action">
+                                    <i class="material-icons">reply</i> Reply
+                                </button>
+                                <button class="notification-action mark-read">
+                                    <i class="material-icons">done</i> Mark as read
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Likes Notification -->
+                    <div class="notification-item unread" data-type="likes" data-time="today">
+                        <div class="notification-avatar tooltip" data-tooltip="David Lee">
+                            <img src="https://ui-avatars.com/api/?name=David+Lee&background=6d28d9&color=fff&size=128" alt="David Lee">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">thumb_up</i>
+                                    <span>David Lee and 5 others liked your post</span>
+                                </div>
+                                <div class="notification-time">3 hours ago</div>
+                            </div>
+                            <div class="notification-post">
+                                Your post: "The ethical implications of AI consciousness: are we creating sentient beings?"
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">visibility</i> View post
+                                </button>
+                                <button class="notification-action mark-read">
+                                    <i class="material-icons">done</i> Mark as read
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Follow Notification -->
+                    <div class="notification-item unread" data-type="follows" data-time="today">
+                        <div class="notification-avatar tooltip" data-tooltip="Alex Zhang">
+                            <img src="https://ui-avatars.com/api/?name=Alex+Zhang&background=dc2626&color=fff&size=128" alt="Alex Zhang">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">person_add</i>
+                                    <span>Alex Zhang started following you</span>
+                                </div>
+                                <div class="notification-time">Yesterday</div>
+                            </div>
+                            <div class="notification-body">
+                                You now have 42 followers
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">person</i> View profile
+                                </button>
+                                <button class="notification-action">
+                                    <i class="material-icons">person_add</i> Follow back
+                                </button>
+                                <button class="notification-action mark-read">
+                                    <i class="material-icons">done</i> Mark as read
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- System Notification -->
+                    <div class="notification-item" data-type="system" data-time="week">
+                        <div class="notification-avatar tooltip" data-tooltip="Storm Write">
+                            <img src="https://ui-avatars.com/api/?name=Storm+Write&background=087ea4&color=fff&size=128" alt="Storm Write">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">campaign</i>
+                                    <span>Welcome to Storm Write!</span>
+                                </div>
+                                <div class="notification-time">2 days ago</div>
+                            </div>
+                            <div class="notification-body">
+                                Thank you for joining our community. To get started, consider exploring topics that interest you and joining discussions.
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">explore</i> Explore topics
+                                </button>
+                                <button class="notification-action">
+                                    <i class="material-icons">help_outline</i> Get help
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mention Notification -->
+                    <div class="notification-item" data-type="mentions" data-time="week">
+                        <div class="notification-avatar tooltip" data-tooltip="Maya Patel">
+                            <img src="https://ui-avatars.com/api/?name=Maya+Patel&background=16a34a&color=fff&size=128" alt="Maya Patel">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">alternate_email</i>
+                                    <span>Maya Patel mentioned you in a comment</span>
+                                </div>
+                                <div class="notification-time">3 days ago</div>
+                            </div>
+                            <div class="notification-body">
+                                "I think @username would have some fascinating insights on this topic given their background in comparative religion."
+                            </div>
+                            <div class="notification-post">
+                                On post: "The intersection of Eastern and Western philosophical traditions"
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">visibility</i> View
+                                </button>
+                                <button class="notification-action">
+                                    <i class="material-icons">reply</i> Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Like Notification -->
+                    <div class="notification-item" data-type="likes" data-time="week">
+                        <div class="notification-avatar tooltip" data-tooltip="Elena Rodriguez">
+                            <img src="https://ui-avatars.com/api/?name=Elena+Rodriguez&background=0891b2&color=fff&size=128" alt="Elena Rodriguez">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">thumb_up</i>
+                                    <span>Elena Rodriguez liked your comment</span>
+                                </div>
+                                <div class="notification-time">4 days ago</div>
+                            </div>
+                            <div class="notification-post">
+                                Your comment: "I believe consciousness arises from complex emergent properties rather than being reducible to quantum effects."
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">visibility</i> View comment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reply Notification -->
+                    <div class="notification-item" data-type="replies" data-time="month">
+                        <div class="notification-avatar tooltip" data-tooltip="Michael Chen">
+                            <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=ea580c&color=fff&size=128" alt="Michael Chen">
+                        </div>
+                        <div class="notification-content">
+                            <div class="notification-header">
+                                <div class="notification-title">
+                                    <i class="material-icons">comment</i>
+                                    <span>Michael Chen replied to your comment</span>
+                                </div>
+                                <div class="notification-time">1 week ago</div>
+                            </div>
+                            <div class="notification-body">
+                                "Your comparison between Taoist concepts of non-action and Buddhist emptiness is fascinating. Have you considered how this relates to Heideggerian notions of Being?"
+                            </div>
+                            <div class="notification-post">
+                                Your comment: "The concept of wu-wei in Taoism bears interesting parallels to śūnyatā in Mahayana Buddhism..."
+                            </div>
+                            <div class="notification-actions">
+                                <button class="notification-action">
+                                    <i class="material-icons">visibility</i> View
+                                </button>
+                                <button class="notification-action">
+                                    <i class="material-icons">reply</i> Reply
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State (Initially Hidden) -->
+                <div class="notification-empty" id="emptyState">
+                    <i class="material-icons">notifications_off</i>
+                    <h3>No notifications yet</h3>
+                    <p>When you receive notifications, they will appear here.</p>
+                    <button class="notification-action" style="margin: 1rem auto; display: inline-flex;">
+                        <i class="material-icons">refresh</i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Storm Write</h2>
+                    <p>A community for meaningful conversations</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-column">
+                        <h3>Navigate</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="topics.html">Topics</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="contact.html">Contact Us</a></li>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                            <li><a href="terms.html">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>About</h3>
+                        <ul>
+                            <li><a href="about.html">Our Story</a></li>
+                            <li><a href="profile.html">Profile</a></li>
+                            <li><a href="write.html">Write</a></li>
+                            <li><a href="settings.html">Settings</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Storm Write. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html> 

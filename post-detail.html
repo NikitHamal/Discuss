@@ -6,12 +6,23 @@
     <title>Discussion - The concept of free will - Storm Write</title>
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- W3.CSS for icons -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Additional Google Fonts for font options -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;700&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/post-detail.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- JavaScript -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -26,10 +37,10 @@
                 <nav class="main-nav">
                     <ul>
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="topics.html">Discover</a></li>
                         <li><a href="topics.html">Topics</a></li>
-                        <li><a href="#">Notifications</a></li>
+                        <li><a href="notifications.html">Notifications</a></li>
                         <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html">Settings</a></li>
                     </ul>
                 </nav>
                 <div class="auth-buttons">
@@ -37,7 +48,7 @@
                     <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
                 </div>
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars"></i>
+                    <i class="material-icons">menu</i>
                 </button>
             </div>
         </div>
@@ -47,10 +58,11 @@
     <div class="mobile-menu">
         <nav class="mobile-menu-nav">
             <a href="index.html">Home</a>
-            <a href="topics.html">Discover</a>
             <a href="topics.html">Topics</a>
-            <a href="#">Notifications</a>
+            <a href="notifications.html">Notifications</a>
             <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
+            <a href="theme-preview.html">Theme Preview</a>
         </nav>
         <div class="mobile-menu-buttons">
             <button class="login-btn" onclick="location.href='login.html'">Login</button>
@@ -63,9 +75,9 @@
         <div class="container">
             <div class="breadcrumbs">
                 <a href="index.html">Home</a> 
-                <i class="fas fa-chevron-right"></i> 
+                <i class="material-icons" style="font-size: 0.7rem;">chevron_right</i>
                 <a href="topics.html">Philosophy</a> 
-                <i class="fas fa-chevron-right"></i> 
+                <i class="material-icons" style="font-size: 0.7rem;">chevron_right</i>
                 <span>The concept of free will</span>
             </div>
 
@@ -75,9 +87,9 @@
                     <div class="post-detail">
                         <div class="post-item expanded">
                             <div class="vote-controls">
-                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                 <span class="vote-count">125</span>
-                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                             </div>
                             <div class="post-content">
                                 <div class="post-header">
@@ -108,10 +120,10 @@
                                 </div>
                                 <div class="post-footer">
                                     <div class="post-actions">
-                                        <a href="#comments" class="post-action"><i class="fas fa-comment-alt"></i> 42 Comments</a>
-                                        <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                                        <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
-                                        <a href="#" class="post-action"><i class="fas fa-flag"></i> Report</a>
+                                        <a href="#comments" class="post-action"><i class="material-icons">comment</i> 42 Comments</a>
+                                        <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                                        <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
+                                        <a href="#" class="post-action"><i class="material-icons">flag</i> Report</a>
                                     </div>
                                     <div class="post-tags">
                                         <span class="tag">#FreeWill</span>
@@ -135,11 +147,11 @@
                                 <textarea placeholder="What are your thoughts on this topic?"></textarea>
                                 <div class="comment-actions">
                                     <div class="formatting-tools">
-                                        <button title="Bold"><i class="fas fa-bold"></i></button>
-                                        <button title="Italic"><i class="fas fa-italic"></i></button>
-                                        <button title="Link"><i class="fas fa-link"></i></button>
-                                        <button title="Quote"><i class="fas fa-quote-right"></i></button>
-                                        <button title="Code"><i class="fas fa-code"></i></button>
+                                        <button title="Bold"><i class="material-icons">format_bold</i></button>
+                                        <button title="Italic"><i class="material-icons">format_italic</i></button>
+                                        <button title="Link"><i class="material-icons">link</i></button>
+                                        <button title="Quote"><i class="material-icons">format_quote</i></button>
+                                        <button title="Code"><i class="material-icons">code</i></button>
                                     </div>
                                     <button class="comment-submit-btn">Post Comment</button>
                                 </div>
@@ -165,9 +177,9 @@
                             <!-- Comment 1 -->
                             <div class="comment">
                                 <div class="vote-controls comment-votes">
-                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                     <span class="vote-count">37</span>
-                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                    <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                                 </div>
                                 <div class="comment-content">
                                     <div class="comment-header">
@@ -182,17 +194,17 @@
                                         <p>Sartre might argue that even recognizing our constraints is an exercise of freedom. The key isn't whether we have absolute freedom (we don't), but whether we take responsibility for our choices within our constraints.</p>
                                     </div>
                                     <div class="comment-footer">
-                                        <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
-                                        <button><i class="fas fa-flag"></i> Report</button>
+                                        <button class="reply-btn"><i class="material-icons">reply</i> Reply</button>
+                                        <button><i class="material-icons">flag</i> Report</button>
                                     </div>
                                     
                                     <!-- Nested Comment -->
                                     <div class="nested-comments">
                                         <div class="comment nested">
                                             <div class="vote-controls comment-votes">
-                                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                                 <span class="vote-count">12</span>
-                                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                                             </div>
                                             <div class="comment-content">
                                                 <div class="comment-header">
@@ -207,8 +219,8 @@
                                                     <p>That's a really insightful point about the spectrum of freedom! I like the connection to Sartre's ideas about taking responsibility regardless of constraints. Do you think modern technology has shifted where we fall on that spectrum compared to previous generations?</p>
                                                 </div>
                                                 <div class="comment-footer">
-                                                    <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
-                                                    <button><i class="fas fa-flag"></i> Report</button>
+                                                    <button class="reply-btn"><i class="material-icons">reply</i> Reply</button>
+                                                    <button><i class="material-icons">flag</i> Report</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -219,9 +231,9 @@
                             <!-- Comment 2 -->
                             <div class="comment">
                                 <div class="vote-controls comment-votes">
-                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                     <span class="vote-count">24</span>
-                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                    <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                                 </div>
                                 <div class="comment-content">
                                     <div class="comment-header">
@@ -236,8 +248,8 @@
                                         <p>However, I'd argue for a compatibilist view - even if our decisions are determined by prior causes (brain states, genetics, environment), what matters is that we can act according to our own desires without external coercion. Social media algorithms do pose a new challenge to this definition when they can predict and shape our desires themselves.</p>
                                     </div>
                                     <div class="comment-footer">
-                                        <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
-                                        <button><i class="fas fa-flag"></i> Report</button>
+                                        <button class="reply-btn"><i class="material-icons">reply</i> Reply</button>
+                                        <button><i class="material-icons">flag</i> Report</button>
                                     </div>
                                 </div>
                             </div>
@@ -245,9 +257,9 @@
                             <!-- Comment 3 -->
                             <div class="comment">
                                 <div class="vote-controls comment-votes">
-                                    <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                    <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                     <span class="vote-count">18</span>
-                                    <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                    <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                                 </div>
                                 <div class="comment-content">
                                     <div class="comment-header">
@@ -262,8 +274,8 @@
                                         <p>Instead of worrying about whether our choices are "free," perhaps we should focus on cultivating awareness and equanimity. By developing mindfulness, we can at least observe the influences acting upon our decisions, even if we can't entirely escape them.</p>
                                     </div>
                                     <div class="comment-footer">
-                                        <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
-                                        <button><i class="fas fa-flag"></i> Report</button>
+                                        <button class="reply-btn"><i class="material-icons">reply</i> Reply</button>
+                                        <button><i class="material-icons">flag</i> Report</button>
                                     </div>
                                 </div>
                             </div>
@@ -300,7 +312,7 @@
                                 <span class="stat-label">Reputation</span>
                             </div>
                         </div>
-                        <button class="follow-btn"><i class="fas fa-user-plus"></i> Follow</button>
+                        <button class="follow-btn"><i class="material-icons">person_add</i> Follow</button>
                     </div>
 
                     <!-- Related Discussions -->
@@ -311,8 +323,8 @@
                                 <a href="#">
                                     <h4>Determinism vs. Compatibilism in modern context</h4>
                                     <div class="related-meta">
-                                        <span>32 comments</span>
-                                        <span>3 days ago</span>
+                                        <span><i class="material-icons">comment</i> 32</span>
+                                        <span><i class="material-icons">access_time</i> 3d</span>
                                     </div>
                                 </a>
                             </li>
@@ -320,8 +332,8 @@
                                 <a href="#">
                                     <h4>The illusion of choice in consumer capitalism</h4>
                                     <div class="related-meta">
-                                        <span>47 comments</span>
-                                        <span>1 week ago</span>
+                                        <span><i class="material-icons">comment</i> 47</span>
+                                        <span><i class="material-icons">access_time</i> 1w</span>
                                     </div>
                                 </a>
                             </li>
@@ -329,8 +341,8 @@
                                 <a href="#">
                                     <h4>Sartre and Existentialism: Freedom and Responsibility</h4>
                                     <div class="related-meta">
-                                        <span>89 comments</span>
-                                        <span>2 weeks ago</span>
+                                        <span><i class="material-icons">comment</i> 89</span>
+                                        <span><i class="material-icons">access_time</i> 2w</span>
                                     </div>
                                 </a>
                             </li>
@@ -351,7 +363,7 @@
                                 <span class="stat-label">Online</span>
                             </div>
                         </div>
-                        <button class="join-topic-btn">Join Topic</button>
+                        <button class="join-topic-btn"><i class="material-icons">group_add</i> Join Topic</button>
                     </div>
                 </aside>
             </div>
@@ -371,7 +383,6 @@
                         <h3>Navigation</h3>
                         <ul>
                             <li><a href="index.html">Home</a></li>
-                            <li><a href="topics.html">Discover</a></li>
                             <li><a href="topics.html">Topics</a></li>
                             <li><a href="#">Popular Discussions</a></li>
                         </ul>
@@ -388,10 +399,10 @@
                     <div class="footer-links-column">
                         <h3>Connect</h3>
                         <ul>
-                            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
-                            <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
-                            <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
-                            <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                            <li><a href="#"><i class="material-icons">twitter</i> Twitter</a></li>
+                            <li><a href="#"><i class="material-icons">photo_camera</i> Instagram</a></li>
+                            <li><a href="#"><i class="material-icons">forum</i> Discord</a></li>
+                            <li><a href="#"><i class="material-icons">smart_display</i> YouTube</a></li>
                         </ul>
                     </div>
                 </div>
@@ -401,8 +412,5 @@
             </div>
         </div>
     </footer>
-
-    <!-- JavaScript -->
-    <script src="js/main.js"></script>
 </body>
 </html> 

@@ -1,7 +1,12 @@
+// Import Firebase services
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+// Import navbar functionality
+import { initNavbar } from './navbar.js';
+
 // DOM Elements
 const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-const mainNav = document.querySelector('.main-nav');
-const authButtons = document.querySelector('.auth-buttons');
+const mobileMenu = document.querySelector('.mobile-menu');
 const voteBtns = document.querySelectorAll('.vote-btn');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const createPostForm = document.querySelector('.create-post');
@@ -9,10 +14,25 @@ const postInput = document.querySelector('.post-input input');
 const postBtn = document.querySelector('.post-btn');
 const categoryTags = document.querySelectorAll('.category-tag');
 
-// Mobile Menu Toggle
+// Auth state observer
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // User is signed in
+        console.log('User is signed in:', user.uid);
+        document.body.classList.add('user-logged-in');
+    } else {
+        // User is signed out
+        console.log('User is signed out');
+        document.body.classList.remove('user-logged-in');
+    }
+});
+
+// Initialize the navbar on all pages
 document.addEventListener('DOMContentLoaded', function() {
-    const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-    const mobileMenu = document.querySelector('.mobile-menu');
+    // Apply settings from localStorage
+    applyThemeSettings();
+    applyFontSettings();
+    applyAnimationsSettings();
     
     if (mobileMenuToggle && mobileMenu) {
         mobileMenuToggle.addEventListener('click', function() {
@@ -20,12 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Toggle between menu and close icons
             const icon = this.querySelector('i');
             if (icon) {
-                if (icon.classList.contains('fa-bars')) {
-                    icon.classList.remove('fa-bars');
-                    icon.classList.add('fa-times');
+                if (icon.textContent === 'menu') {
+                    icon.textContent = 'close';
+                    // Prevent scrolling on body when menu is open
+                    document.body.style.overflow = 'hidden';
                 } else {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
+                    icon.textContent = 'menu';
+                    // Allow scrolling again
+                    document.body.style.overflow = '';
                 }
             }
         });
@@ -38,15 +60,149 @@ document.addEventListener('DOMContentLoaded', function() {
             !mobileMenuToggle.contains(event.target)) {
             mobileMenu.classList.remove('open');
             
-            // Reset icon
+            // Reset icon and allow scrolling
             const icon = mobileMenuToggle.querySelector('i');
             if (icon) {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
+                icon.textContent = 'menu';
             }
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Add active class to current page link in navbar
+    const currentPage = window.location.pathname.split('/').pop();
+    const navLinks = document.querySelectorAll('.main-nav a, .mobile-menu-nav a');
+    
+    navLinks.forEach(link => {
+        // Extract the href attribute and compare with current page
+        const linkPage = link.getAttribute('href');
+        
+        if (linkPage === currentPage || 
+            (currentPage === '' && linkPage === 'index.html') ||
+            (currentPage === '/' && linkPage === 'index.html')) {
+            link.classList.add('active');
+        } else if (link.classList.contains('active')) {
+            link.classList.remove('active');
         }
     });
 });
+
+// Apply theme settings
+function applyThemeSettings() {
+    try {
+        // Apply theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        
+        // Remove all theme classes first
+        document.body.classList.remove('theme-philosophical', 'theme-science', 'theme-nature', 'theme-cyberpunk', 'theme-minimal');
+        
+        // If it's a special theme, add the class
+        if (savedTheme.startsWith('theme-')) {
+            document.body.classList.add(savedTheme);
+        }
+        
+        // Apply dark mode
+        const isDarkMode = localStorage.getItem('darkMode') === 'enabled' || 
+                           savedTheme === 'dark' || 
+                           (savedTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            
+            // Apply dark mode to header/navbar
+            const header = document.querySelector('.header');
+            if (header) {
+                header.classList.add('dark-mode');
+            }
+            
+            // Apply to mobile menu if it exists
+            if (mobileMenu) {
+                mobileMenu.classList.add('dark-mode');
+            }
+        } else {
+            document.body.classList.remove('dark-mode');
+            
+            // Remove dark mode from header/navbar
+            const header = document.querySelector('.header');
+            if (header) {
+                header.classList.remove('dark-mode');
+            }
+            
+            // Remove from mobile menu if it exists
+            if (mobileMenu) {
+                mobileMenu.classList.remove('dark-mode');
+            }
+        }
+        
+        // Listen for system theme changes if auto is selected
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            
+            if (currentTheme === 'auto') {
+                const systemDarkMode = event.matches;
+                
+                if (systemDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    
+                    // Apply dark mode to header/navbar
+                    const header = document.querySelector('.header');
+                    if (header) {
+                        header.classList.add('dark-mode');
+                    }
+                    
+                    // Apply to mobile menu if it exists
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('dark-mode');
+                    }
+                    
+                    localStorage.setItem('darkMode', 'enabled');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    
+                    // Remove dark mode from header/navbar
+                    const header = document.querySelector('.header');
+                    if (header) {
+                        header.classList.remove('dark-mode');
+                    }
+                    
+                    // Remove from mobile menu if it exists
+                    if (mobileMenu) {
+                        mobileMenu.classList.remove('dark-mode');
+                    }
+                    
+                    localStorage.setItem('darkMode', 'disabled');
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error applying theme settings:', error);
+    }
+}
+
+// Apply font settings
+function applyFontSettings() {
+    try {
+        // Apply font family if saved
+        const savedFont = localStorage.getItem('fontFamily') || 'Poppins';
+        document.documentElement.style.setProperty('--font-family', `'${savedFont}', sans-serif`);
+        
+        // Apply font size if saved
+        const savedFontSize = localStorage.getItem('fontSize') || '16';
+        document.documentElement.style.setProperty('--base-font-size', `${savedFontSize}px`);
+    } catch (error) {
+        console.log('Error applying font settings:', error);
+    }
+}
+
+// Apply animations settings
+function applyAnimationsSettings() {
+    // Apply reduce animations if enabled
+    if (localStorage.getItem('reduceAnimations') === 'true') {
+        document.documentElement.classList.add('reduce-animations');
+    } else {
+        document.documentElement.classList.remove('reduce-animations');
+    }
+}
 
 // Handle voting
 if (voteBtns.length) {
@@ -109,7 +265,6 @@ if (filterBtns.length) {
             btn.classList.add('active');
             
             // Here you would typically fetch or filter posts based on selection
-            // For demo purposes, we'll just show a message
             console.log(`Posts filtered by: ${btn.textContent.trim()}`);
         });
     });
@@ -130,7 +285,6 @@ if (categoryTags.length) {
             tag.classList.add('active');
             
             // Here you would typically fetch posts for the selected category
-            // For demo purposes, we'll just show a message
             console.log(`Category selected: ${tag.textContent.trim()}`);
         });
     });
@@ -173,9 +327,9 @@ function createNewPost(text) {
     // Create post HTML structure
     newPost.innerHTML = `
         <div class="vote-controls">
-            <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+            <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
             <span class="vote-count">${randomVotes}</span>
-            <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+            <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
         </div>
         <div class="post-content">
             <div class="post-header">
@@ -191,9 +345,9 @@ function createNewPost(text) {
             </div>
             <div class="post-footer">
                 <div class="post-actions">
-                    <a href="#" class="post-action"><i class="fas fa-comment-alt"></i> 0 Comments</a>
-                    <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                    <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                    <a href="#" class="post-action"><i class="material-icons">comment</i> 0 Comments</a>
+                    <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                    <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
                 </div>
             </div>
         </div>
@@ -238,70 +392,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Add scroll animation for a better UX
-window.addEventListener('scroll', () => {
-    const scrollPos = window.scrollY;
-    const header = document.querySelector('.header');
-    
-    if (header) {
-        if (scrollPos > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    }
-});
-
-// Handle dark mode toggle (for future implementation)
-const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-if (prefersDarkMode) {
-    // For future implementation
-    console.log('User prefers dark mode');
-}
-
-// Add CSS for the mobile menu and scrolled header state
+// Simplified styles for voted buttons
 const style = document.createElement('style');
 style.textContent = `
-    .mobile-menu {
-        position: fixed;
-        top: 70px;
-        left: 0;
-        right: 0;
-        background-color: var(--background-color);
-        padding: 1rem;
-        box-shadow: var(--shadow-md);
-        z-index: 99;
-        transform: translateY(-100%);
-        opacity: 0;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-        visibility: hidden;
-    }
-    
-    .mobile-menu.active {
-        transform: translateY(0);
-        opacity: 1;
-        visibility: visible;
-    }
-    
-    .mobile-menu .main-nav ul {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .mobile-menu .auth-buttons {
-        margin-top: 1.5rem;
-        justify-content: center;
-    }
-    
-    body.menu-open {
-        overflow: hidden;
-    }
-    
-    .header.scrolled {
-        box-shadow: var(--shadow-md);
-    }
-    
     .vote-btn.voted.upvote {
         color: var(--success-color);
     }

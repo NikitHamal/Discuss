@@ -6,11 +6,21 @@
     <title>Storm Write - Community Forum</title>
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- W3.CSS for icons -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- Scripts -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -25,10 +35,10 @@
                 <nav class="main-nav">
                     <ul>
                         <li><a href="index.html" class="active">Home</a></li>
-                        <li><a href="topics.html">Discover</a></li>
                         <li><a href="topics.html">Topics</a></li>
-                        <li><a href="#">Notifications</a></li>
+                        <li><a href="notifications.html">Notifications</a></li>
                         <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html">Settings</a></li>
                     </ul>
                 </nav>
                 <div class="auth-buttons">
@@ -36,7 +46,7 @@
                     <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
                 </div>
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars"></i>
+                    <i class="material-icons">menu</i>
                 </button>
             </div>
         </div>
@@ -46,10 +56,10 @@
     <div class="mobile-menu">
         <nav class="mobile-menu-nav">
             <a href="index.html" class="active">Home</a>
-            <a href="topics.html">Discover</a>
             <a href="topics.html">Topics</a>
-            <a href="#">Notifications</a>
+            <a href="notifications.html">Notifications</a>
             <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
         </nav>
         <div class="mobile-menu-buttons">
             <button class="login-btn" onclick="location.href='login.html'">Login</button>
@@ -87,12 +97,12 @@
 
                     <!-- Filter Options -->
                     <div class="filter-options">
-                        <button class="filter-btn active"><i class="fas fa-fire"></i> Hot</button>
-                        <button class="filter-btn"><i class="fas fa-certificate"></i> New</button>
-                        <button class="filter-btn"><i class="fas fa-arrow-up"></i> Top</button>
+                        <button class="filter-btn active"><i class="material-icons">whatshot</i> Hot</button>
+                        <button class="filter-btn"><i class="material-icons">new_releases</i> New</button>
+                        <button class="filter-btn"><i class="material-icons">trending_up</i> Top</button>
                         <div class="sort-dropdown">
                             <button class="sort-btn">
-                                <i class="fas fa-sort"></i> Sort
+                                <i class="material-icons">sort</i> Sort
                             </button>
                             <div class="dropdown-content">
                                 <a href="#">Most Discussed</a>
@@ -104,12 +114,12 @@
 
                     <!-- Featured Discussion -->
                     <div class="featured-discussion">
-                        <div class="featured-label"><i class="fas fa-star"></i> Featured Discussion</div>
+                        <div class="featured-label"><i class="material-icons">star</i> Featured Discussion</div>
                         <div class="post-item featured">
                             <div class="vote-controls">
-                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                 <span class="vote-count">358</span>
-                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                             </div>
                             <div class="post-content">
                                 <div class="post-header">
@@ -125,9 +135,9 @@
                                 </div>
                                 <div class="post-footer">
                                     <div class="post-actions">
-                                        <a href="post-detail.html" class="post-action"><i class="fas fa-comment-alt"></i> 124 Comments</a>
-                                        <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                                        <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        <a href="post-detail.html" class="post-action"><i class="material-icons">comment</i> 124 Comments</a>
+                                        <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                                        <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
                                     </div>
                                 </div>
                             </div>
@@ -139,9 +149,9 @@
                         <!-- Post Item 1 -->
                         <div class="post-item">
                             <div class="vote-controls">
-                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                 <span class="vote-count">125</span>
-                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                             </div>
                             <div class="post-content">
                                 <div class="post-header">
@@ -157,9 +167,9 @@
                                 </div>
                                 <div class="post-footer">
                                     <div class="post-actions">
-                                        <a href="post-detail.html" class="post-action"><i class="fas fa-comment-alt"></i> 42 Comments</a>
-                                        <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                                        <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        <a href="post-detail.html" class="post-action"><i class="material-icons">comment</i> 42 Comments</a>
+                                        <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                                        <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
                                     </div>
                                 </div>
                             </div>
@@ -168,9 +178,9 @@
                         <!-- Post Item 2 -->
                         <div class="post-item">
                             <div class="vote-controls">
-                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                 <span class="vote-count">89</span>
-                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                             </div>
                             <div class="post-content">
                                 <div class="post-header">
@@ -186,9 +196,9 @@
                                 </div>
                                 <div class="post-footer">
                                     <div class="post-actions">
-                                        <a href="post-detail.html" class="post-action"><i class="fas fa-comment-alt"></i> 37 Comments</a>
-                                        <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                                        <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        <a href="post-detail.html" class="post-action"><i class="material-icons">comment</i> 37 Comments</a>
+                                        <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                                        <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
                                     </div>
                                 </div>
                             </div>
@@ -197,9 +207,9 @@
                         <!-- Post Item 3 -->
                         <div class="post-item">
                             <div class="vote-controls">
-                                <button class="vote-btn upvote"><i class="fas fa-thumbs-up"></i></button>
+                                <button class="vote-btn upvote"><i class="material-icons">thumb_up</i></button>
                                 <span class="vote-count">214</span>
-                                <button class="vote-btn downvote"><i class="fas fa-thumbs-down"></i></button>
+                                <button class="vote-btn downvote"><i class="material-icons">thumb_down</i></button>
                             </div>
                             <div class="post-content">
                                 <div class="post-header">
@@ -215,9 +225,9 @@
                                 </div>
                                 <div class="post-footer">
                                     <div class="post-actions">
-                                        <a href="post-detail.html" class="post-action"><i class="fas fa-comment-alt"></i> 78 Comments</a>
-                                        <a href="#" class="post-action"><i class="fas fa-share"></i> Share</a>
-                                        <a href="#" class="post-action"><i class="fas fa-bookmark"></i> Save</a>
+                                        <a href="post-detail.html" class="post-action"><i class="material-icons">comment</i> 78 Comments</a>
+                                        <a href="#" class="post-action"><i class="material-icons">share</i> Share</a>
+                                        <a href="#" class="post-action"><i class="material-icons">bookmark</i> Save</a>
                                     </div>
                                 </div>
                             </div>
@@ -226,13 +236,13 @@
 
                     <!-- Pagination -->
                     <div class="pagination">
-                        <a href="#" class="page-link prev"><i class="fas fa-chevron-left"></i></a>
+                        <a href="#" class="page-link prev"><i class="material-icons">chevron_left</i></a>
                         <a href="#" class="page-link active">1</a>
                         <a href="#" class="page-link">2</a>
                         <a href="#" class="page-link">3</a>
                         <span class="page-ellipsis">...</span>
                         <a href="#" class="page-link">12</a>
-                        <a href="#" class="page-link next"><i class="fas fa-chevron-right"></i></a>
+                        <a href="#" class="page-link next"><i class="material-icons">chevron_right</i></a>
                     </div>
                 </div>
 
@@ -253,7 +263,7 @@
                             </div>
                         </div>
                         <div class="community-created">
-                            <i class="fas fa-birthday-cake"></i> Created Jan 15, 2023
+                            <i class="material-icons">cake</i> Created Jan 15, 2023
                         </div>
                         <a href="about.html" class="link-btn">Learn More</a>
                         <button class="join-community-btn">Join Community</button>
@@ -300,7 +310,7 @@
                                 </a>
                             </li>
                         </ul>
-                        <a href="topics.html" class="view-all-link">View all topics <i class="fas fa-arrow-right"></i></a>
+                        <a href="topics.html" class="view-all-link">View all topics <i class="material-icons">arrow_forward</i></a>
                     </div>
                 </aside>
             </div>
@@ -317,30 +327,29 @@
                 </div>
                 <div class="footer-links">
                     <div class="footer-links-column">
-                        <h3>Navigation</h3>
+                        <h3>Navigate</h3>
                         <ul>
                             <li><a href="index.html">Home</a></li>
-                            <li><a href="topics.html">Discover</a></li>
                             <li><a href="topics.html">Topics</a></li>
-                            <li><a href="#">Popular Discussions</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
                         </ul>
                     </div>
                     <div class="footer-links-column">
                         <h3>Support</h3>
                         <ul>
-                            <li><a href="about.html">About Us</a></li>
-                            <li><a href="#">Community Guidelines</a></li>
-                            <li><a href="#">Privacy Policy</a></li>
-                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="contact.html">Contact Us</a></li>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                            <li><a href="terms.html">Terms of Service</a></li>
                         </ul>
                     </div>
                     <div class="footer-links-column">
-                        <h3>Connect</h3>
+                        <h3>About</h3>
                         <ul>
-                            <li><a href="#"><i class="fab fa-twitter"></i> Twitter</a></li>
-                            <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
-                            <li><a href="#"><i class="fab fa-discord"></i> Discord</a></li>
-                            <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                            <li><a href="about.html">Our Story</a></li>
+                            <li><a href="profile.html">Profile</a></li>
+                            <li><a href="write.html">Write</a></li>
+                            <li><a href="settings.html">Settings</a></li>
                         </ul>
                     </div>
                 </div>
@@ -350,8 +359,5 @@
             </div>
         </div>
     </footer>
-
-    <!-- JavaScript -->
-    <script src="js/main.js"></script>
 </body>
 </html>

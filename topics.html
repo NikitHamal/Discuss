@@ -6,12 +6,23 @@
     <title>Topics - Storm Write</title>
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- W3.CSS for icons -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/topics.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- JavaScript -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/main.js"></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -26,10 +37,10 @@
                 <nav class="main-nav">
                     <ul>
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="topics.html" class="active">Discover</a></li>
-                        <li><a href="topics.html">Topics</a></li>
-                        <li><a href="#">Notifications</a></li>
+                        <li><a href="topics.html" class="active">Topics</a></li>
+                        <li><a href="notifications.html">Notifications</a></li>
                         <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html">Settings</a></li>
                     </ul>
                 </nav>
                 <div class="auth-buttons">
@@ -37,7 +48,7 @@
                     <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
                 </div>
                 <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars"></i>
+                    <i class="material-icons">menu</i>
                 </button>
             </div>
         </div>
@@ -47,10 +58,10 @@
     <div class="mobile-menu">
         <nav class="mobile-menu-nav">
             <a href="index.html">Home</a>
-            <a href="topics.html" class="active">Discover</a>
-            <a href="topics.html">Topics</a>
-            <a href="#">Notifications</a>
+            <a href="topics.html" class="active">Topics</a>
+            <a href="notifications.html">Notifications</a>
             <a href="profile.html">Profile</a>
+            <a href="settings.html">Settings</a>
         </nav>
         <div class="mobile-menu-buttons">
             <button class="login-btn" onclick="location.href='login.html'">Login</button>
@@ -63,7 +74,7 @@
         <div class="container">
             <div class="page-header">
                 <h1>Explore Topics</h1>
-                <p>Discover communities centered around philosophical, religious, and spiritual discussions</p>
+                <p>Explore communities centered around philosophical, religious, and spiritual discussions</p>
             </div>
 
             <!-- Search and Filter -->
@@ -357,9 +368,9 @@
                         <h3>Navigation</h3>
                         <ul>
                             <li><a href="index.html">Home</a></li>
-                            <li><a href="topics.html">Discover</a></li>
                             <li><a href="topics.html">Topics</a></li>
-                            <li><a href="#">Popular Discussions</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                            <li><a href="settings.html">Settings</a></li>
                         </ul>
                     </div>
                     <div class="footer-links-column">
@@ -387,8 +398,5 @@
             </div>
         </div>
     </footer>
-
-    <!-- JavaScript -->
-    <script src="js/main.js"></script>
 </body>
 </html> 

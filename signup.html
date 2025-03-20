@@ -6,12 +6,21 @@
     <title>Sign Up - Storm Write</title>
     <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- W3.CSS for icons -->
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/signup.css">
+    <style>
+        /* Override any animation-related styles */
+        * {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Header Section -->
@@ -26,8 +35,10 @@
                 <nav class="main-nav">
                     <ul>
                         <li><a href="index.html">Home</a></li>
-                        <li><a href="topics.html">Discover</a></li>
                         <li><a href="topics.html">Topics</a></li>
+                        <li><a href="notifications.html">Notifications</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html">Settings</a></li>
                     </ul>
                 </nav>
             </div>
@@ -42,124 +53,312 @@
                     <h2>Create Your Account</h2>
                     <p>Join our thoughtful community</p>
                 </div>
-                <form class="auth-form">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="username" placeholder="Choose a unique username">
+                
+                <!-- Signup Progress Bar -->
+                <div class="signup-progress">
+                    <div class="progress-line" data-progress="0"></div>
+                    <div class="progress-step active" data-step="1" data-label="Account">1</div>
+                    <div class="progress-step" data-step="2" data-label="Profile">2</div>
+                    <div class="progress-step" data-step="3" data-label="Interests">3</div>
+                    <div class="progress-step" data-step="4" data-label="Finish">4</div>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="signup-error" class="auth-error" role="alert"></div>
+                
+                <!-- Multi-step Form -->
+                <form id="signup-form" class="auth-form">
+                    <!-- Step 1: Account Info -->
+                    <div class="step-card active" id="step-1">
+                        <div class="step-card-header">
+                            <h3>Account Information</h3>
+                            <p>Create your account credentials</p>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-envelope"></i>
-                            <input type="email" id="email" placeholder="Enter your email address">
+                        
+                        <div class="form-group username-validation">
+                            <label for="username">Username</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="username" placeholder="Choose a unique username" aria-describedby="username-feedback">
+                                <div id="username-spinner" class="spinner">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                            </div>
+                            <div id="username-feedback" class="feedback"></div>
+                            <div id="username-suggestions" class="username-suggestions"></div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="password" placeholder="Create a strong password">
-                            <button type="button" class="password-toggle">
-                                <i class="fas fa-eye"></i>
-                            </button>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" placeholder="Enter your email address" aria-describedby="email-feedback">
+                            </div>
+                            <div id="email-feedback" class="feedback"></div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="confirm-password">Confirm Password</label>
-                        <div class="input-with-icon">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="confirm-password" placeholder="Confirm your password">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" class="password-input" placeholder="Create a strong password" aria-describedby="password-feedback">
+                                <button type="button" class="password-toggle" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength">
+                                <div class="password-strength-bar"></div>
+                            </div>
+                            <div class="password-requirements">
+                                <div class="requirement unmet" id="req-length">
+                                    <i class="fas fa-circle"></i> At least 8 characters
+                                </div>
+                                <div class="requirement unmet" id="req-uppercase">
+                                    <i class="fas fa-circle"></i> At least 1 uppercase letter
+                                </div>
+                                <div class="requirement unmet" id="req-lowercase">
+                                    <i class="fas fa-circle"></i> At least 1 lowercase letter
+                                </div>
+                                <div class="requirement unmet" id="req-number">
+                                    <i class="fas fa-circle"></i> At least 1 number
+                                </div>
+                                <div class="requirement unmet" id="req-special">
+                                    <i class="fas fa-circle"></i> At least 1 special character
+                                </div>
+                            </div>
+                            <div id="password-feedback" class="feedback"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm Password</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="confirm-password" class="password-input" placeholder="Confirm your password" aria-describedby="confirm-password-feedback">
+                                <button type="button" class="password-toggle" aria-label="Show password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-match-indicator">
+                                <i class="fas fa-times-circle"></i> Passwords do not match
+                            </div>
+                            <div id="confirm-password-feedback" class="feedback"></div>
+                        </div>
+                        
+                        <div class="step-actions">
+                            <div></div> <!-- Empty div for spacing -->
+                            <button type="button" class="auth-button next-step">Next</button>
                         </div>
                     </div>
                     
-                    <div class="form-group interests">
-                        <label>Areas of Interest (choose at least 3)</label>
-                        <div class="interest-tags">
-                            <div class="interest-tag">
-                                <input type="checkbox" id="philosophy" name="interests" value="philosophy">
-                                <label for="philosophy">Philosophy</label>
+                    <!-- Step 2: Profile Info -->
+                    <div class="step-card" id="step-2">
+                        <div class="step-card-header">
+                            <h3>Profile Information</h3>
+                            <p>Tell us more about yourself</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="display-name">Display Name</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-id-card"></i>
+                                <input type="text" id="display-name" placeholder="Your full name" aria-describedby="display-name-feedback">
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="religion" name="interests" value="religion">
-                                <label for="religion">Religion</label>
+                            <div id="display-name-feedback" class="feedback"></div>
+                        </div>
+                        
+                        <div class="avatar-section">
+                            <label for="file-input">Profile Picture</label>
+                            <img id="avatar-preview" class="avatar-preview" style="display: none;" alt="Profile Preview">
+                            
+                            <div class="avatar-options">
+                                <div id="custom-file-upload" class="avatar-upload-btn" tabindex="0" role="button" aria-controls="file-input">
+                                    <i class="fas fa-cloud-upload-alt"></i> Upload a photo
+                                </div>
+                                <input type="file" id="file-input" class="file-input" accept="image/*" aria-label="Upload profile picture">
+                                
+                                <div>
+                                    <p>Or choose from our default avatars:</p>
+                                    <div id="default-avatars" class="default-avatars" role="radiogroup" aria-label="Default profile pictures"></div>
+                                </div>
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="spirituality" name="interests" value="spirituality">
-                                <label for="spirituality">Spirituality</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="gender">Gender (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-venus-mars"></i>
+                                <select id="gender" aria-label="Select gender">
+                                    <option value="">Prefer not to say</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="non-binary">Non-binary</option>
+                                    <option value="other">Other</option>
+                                </select>
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="ethics" name="interests" value="ethics">
-                                <label for="ethics">Ethics</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="birthday">Birthday</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-birthday-cake"></i>
+                                <input type="date" id="birthday" aria-describedby="birthday-feedback">
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="metaphysics" name="interests" value="metaphysics">
-                                <label for="metaphysics">Metaphysics</label>
+                            <div id="birthday-feedback" class="feedback"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location (Optional)</label>
+                            <div class="input-with-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="location" placeholder="City, Country">
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="existentialism" name="interests" value="existentialism">
-                                <label for="existentialism">Existentialism</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bio">
+                                Bio (Optional) 
+                                <div class="help-tooltip">
+                                    <i class="fas fa-question-circle help-icon"></i>
+                                    <span class="tooltip-text">Tell others about yourself - your interests, background, or what you hope to share on Storm Write</span>
+                                </div>
+                                <button type="button" class="preview-toggle">
+                                    <i class="fas fa-eye"></i> Preview
+                                </button>
+                            </label>
+                            <div class="textarea-container">
+                                <textarea id="bio" placeholder="Tell us a bit about yourself" rows="3" maxlength="300"></textarea>
+                                <div class="char-counter"><span id="bio-char-count">0</span>/300</div>
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="consciousness" name="interests" value="consciousness">
-                                <label for="consciousness">Consciousness</label>
+                            <div class="bio-preview">
+                                <p class="preview-title">Preview:</p>
+                                <div id="bio-preview-content"></div>
                             </div>
-                            <div class="interest-tag">
-                                <input type="checkbox" id="meditation" name="interests" value="meditation">
-                                <label for="meditation">Meditation</label>
+                            <div class="bio-tags">
+                                <span class="bio-tag" data-tag="Writer">Writer</span>
+                                <span class="bio-tag" data-tag="Philosopher">Philosopher</span>
+                                <span class="bio-tag" data-tag="Student">Student</span>
+                                <span class="bio-tag" data-tag="Teacher">Teacher</span>
+                                <span class="bio-tag" data-tag="Researcher">Researcher</span>
+                                <span class="bio-tag" data-tag="Thinker">Thinker</span>
                             </div>
+                        </div>
+                        
+                        <div class="step-actions">
+                            <button type="button" class="auth-button secondary prev-step">Back</button>
+                            <button type="button" class="auth-button next-step">Next</button>
                         </div>
                     </div>
                     
-                    <div class="form-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="terms" required>
-                            <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                    <!-- Step 3: Interests -->
+                    <div class="step-card" id="step-3">
+                        <div class="step-card-header">
+                            <h3>Your Interests</h3>
+                            <p>Select topics you're interested in (choose at least 3)</p>
+                        </div>
+                        
+                        <div class="form-group interests">
+                            <div class="interest-tags" role="group" aria-label="Interest topics">
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="philosophy" name="interests" value="philosophy">
+                                    <label for="philosophy">Philosophy</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="religion" name="interests" value="religion">
+                                    <label for="religion">Religion</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="spirituality" name="interests" value="spirituality">
+                                    <label for="spirituality">Spirituality</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="ethics" name="interests" value="ethics">
+                                    <label for="ethics">Ethics</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="metaphysics" name="interests" value="metaphysics">
+                                    <label for="metaphysics">Metaphysics</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="existentialism" name="interests" value="existentialism">
+                                    <label for="existentialism">Existentialism</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="consciousness" name="interests" value="consciousness">
+                                    <label for="consciousness">Consciousness</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="meditation" name="interests" value="meditation">
+                                    <label for="meditation">Meditation</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="psychology" name="interests" value="psychology">
+                                    <label for="psychology">Psychology</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="science" name="interests" value="science">
+                                    <label for="science">Science</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="mysticism" name="interests" value="mysticism">
+                                    <label for="mysticism">Mysticism</label>
+                                </div>
+                                <div class="interest-tag">
+                                    <input type="checkbox" id="theology" name="interests" value="theology">
+                                    <label for="theology">Theology</label>
+                                </div>
+                            </div>
+                            <div id="interests-feedback" class="feedback"></div>
+                        </div>
+                        
+                        <div class="step-actions">
+                            <button type="button" class="auth-button secondary prev-step">Back</button>
+                            <button type="button" class="auth-button next-step">Next</button>
                         </div>
                     </div>
-                    <button type="submit" class="auth-button">Create Account</button>
-                    <div class="auth-separator">
-                        <span>OR</span>
-                    </div>
-                    <div class="social-login">
-                        <button type="button" class="social-btn google">
-                            <i class="fab fa-google"></i> Continue with Google
-                        </button>
-                        <button type="button" class="social-btn facebook">
-                            <i class="fab fa-facebook-f"></i> Continue with Facebook
-                        </button>
-                        <button type="button" class="social-btn twitter">
-                            <i class="fab fa-twitter"></i> Continue with Twitter
-                        </button>
+                    
+                    <!-- Step 4: Terms and Create Account -->
+                    <div class="step-card" id="step-4">
+                        <div class="step-card-header">
+                            <h3>Almost Done!</h3>
+                            <p>Review and create your account</p>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="terms" required>
+                                <label for="terms">I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a></label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-options">
+                            <div class="remember-me">
+                                <input type="checkbox" id="newsletter">
+                                <label for="newsletter">I want to receive emails about new features and updates</label>
+                            </div>
+                        </div>
+                        
+                        <div class="info-text">
+                            <p>After creating your account, you'll need to verify your email address before 
+                            you can fully participate in discussions. We'll send you a verification 
+                            link to the email address you provided.</p>
+                        </div>
+                        
+                        <div class="step-actions">
+                            <button type="button" class="auth-button secondary prev-step">Back</button>
+                            <button type="submit" id="submit-btn" class="auth-button">Create Account</button>
+                        </div>
                     </div>
                 </form>
+                
+                <div class="auth-separator">
+                    <span>OR</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn google">
+                        <i class="fab fa-google"></i> Continue with Google
+                    </button>
+                </div>
+                
                 <div class="auth-footer">
                     <p>Already have an account? <a href="login.html">Login</a></p>
-                </div>
-            </div>
-            <div class="auth-info">
-                <div class="auth-info-content">
-                    <h2>Why Join Storm Write?</h2>
-                    <p>Create an account to become part of a vibrant community dedicated to thoughtful discussion and intellectual exploration.</p>
-                    <ul class="auth-benefits">
-                        <li><i class="fas fa-check-circle"></i> Participate in deep philosophical conversations</li>
-                        <li><i class="fas fa-check-circle"></i> Follow topics that interest you</li>
-                        <li><i class="fas fa-check-circle"></i> Build your reputation through quality contributions</li>
-                        <li><i class="fas fa-check-circle"></i> Connect with other philosophical minds</li>
-                        <li><i class="fas fa-check-circle"></i> Receive personalized recommendations</li>
-                    </ul>
-                    <div class="auth-testimonial">
-                        <p>"The depth of conversations here is unmatched. I've found a community that truly values thoughtful dialogue over quick reactions."</p>
-                        <div class="testimonial-author">
-                            <img src="https://ui-avatars.com/api/?name=Michael+Chen&background=16a34a&color=fff&size=48" alt="Michael Chen">
-                            <div>
-                                <h4>Michael Chen</h4>
-                                <p>Comparative Religion Scholar</p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -171,9 +370,9 @@
             <div class="footer-bottom">
                 <p>&copy; 2023 Storm Write. All rights reserved.</p>
                 <div class="footer-links-minimal">
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Help Center</a>
+                    <a href="terms.html">Terms of Service</a>
+                    <a href="privacy.html">Privacy Policy</a>
+                    <a href="faq.html">Help Center</a>
                     <a href="about.html">About</a>
                 </div>
             </div>
@@ -181,56 +380,8 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="js/main.js"></script>
-    <script>
-        // Password visibility toggle
-        document.querySelector('.password-toggle').addEventListener('click', function() {
-            const passwordInput = document.getElementById('password');
-            const icon = this.querySelector('i');
-            
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        });
-        
-        // Form validation
-        document.querySelector('.auth-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const interests = document.querySelectorAll('input[name="interests"]:checked');
-            
-            // Simple validation
-            if (!username || !email || !password || !confirmPassword) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                alert('Passwords do not match');
-                return;
-            }
-            
-            if (interests.length < 3) {
-                alert('Please select at least 3 areas of interest');
-                return;
-            }
-            
-            // In a real app, send this to server
-            console.log('Form submitted successfully');
-            
-            // Redirect to home page or verification page
-            // window.location.href = 'index.html';
-        });
-    </script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/signup.js"></script>
 </body>
 </html> 

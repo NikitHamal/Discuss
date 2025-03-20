@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Additional Google Fonts for font options -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;700&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-storage-compat.js"></script>
+    <!-- JavaScript -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/navbar.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/settings.js"></script>
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .settings-section {
+            background-color: var(--background-color);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .settings-section h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .settings-section h2 i {
+            color: var(--primary-color);
+        }
+        
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .option-info {
+            flex: 1;
+        }
+        
+        .option-info h3 {
+            margin: 0 0 0.25rem 0;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        .option-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:focus + .slider {
+            box-shadow: 0 0 1px var(--primary-color);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Button styles */
+        .settings-button {
+            padding: 0.5rem 1rem;
+            background-color: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            color: var(--text-color);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .settings-button:hover {
+            background-color: var(--primary-color-light);
+        }
+        
+        .settings-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .settings-button.primary:hover {
+            background-color: var(--primary-color-dark);
+        }
+        
+        .settings-button.danger {
+            background-color: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
+        }
+        
+        .settings-button.danger:hover {
+            background-color: var(--danger-color-dark);
+        }
+        
+        /* Radio button styles */
+        .theme-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .theme-option {
+            flex: 1;
+            background-color: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .theme-option.active {
+            border-color: var(--primary-color);
+            background-color: rgba(var(--primary-rgb), 0.05);
+        }
+        
+        .theme-option:hover:not(.active) {
+            border-color: var(--primary-color-light);
+        }
+        
+        .theme-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        .theme-option.active .theme-icon {
+            color: var(--primary-color);
+        }
+        
+        .theme-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .theme-preview {
+            width: 100%;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .theme-option:nth-child(1) .theme-preview {
+            background-color: #ffffff;
+            color: #333333;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .theme-option:nth-child(2) .theme-preview {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .theme-option:nth-child(3) .theme-preview {
+            background: linear-gradient(to right, #ffffff 50%, #1a1a1a 50%);
+            color: #333333;
+            position: relative;
+        }
+        
+        .theme-option:nth-child(3) .theme-preview:after {
+            content: "Auto";
+            position: absolute;
+            color: #ffffff;
+            right: 25%;
+        }
+        
+        .theme-option:nth-child(3) .theme-preview:before {
+            content: "Auto";
+            position: absolute;
+            color: #333333;
+            left: 25%;
+        }
+        
+        /* Success alert */
+        .settings-alert {
+            padding: 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        .settings-alert.success {
+            background-color: rgba(var(--success-rgb), 0.1);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+        
+        .settings-alert.error {
+            background-color: rgba(var(--danger-rgb), 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+        
+        /* Font selection styles */
+        .font-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .font-option {
+            flex: 1;
+            min-width: 120px;
+            background-color: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .font-option.active {
+            border-color: var(--primary-color);
+            background-color: rgba(var(--primary-rgb), 0.05);
+        }
+        
+        .font-option:hover:not(.active) {
+            border-color: var(--primary-color-light);
+        }
+        
+        .font-name {
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+        
+        .font-preview {
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+            color: var(--text-color);
+        }
+        
+        /* Font size styles */
+        .font-size-options {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .font-size-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 5px;
+            background: var(--border-color);
+            outline: none;
+        }
+        
+        .font-size-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .font-size-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .font-size-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        .font-size-value {
+            font-size: 0.9rem;
+            font-weight: 500;
+            width: 40px;
+            text-align: center;
+            color: var(--text-color);
+        }
+        
+        .font-size-sample {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            background-color: var(--background-light);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <a href="index.html">
+                        <h1>Storm Write</h1>
+                    </a>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="topics.html">Topics</a></li>
+                        <li><a href="notifications.html">Notifications</a></li>
+                        <li><a href="profile.html">Profile</a></li>
+                        <li><a href="settings.html" class="active">Settings</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <button class="login-btn" onclick="location.href='login.html'">Login</button>
+                    <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                    <i class="material-icons">menu</i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <nav class="mobile-menu-nav">
+            <a href="index.html">Home</a>
+            <a href="topics.html">Topics</a>
+            <a href="notifications.html">Notifications</a>
+            <a href="profile.html">Profile</a>
+            <a href="settings.html" class="active">Settings</a>
+        </nav>
+        <div class="mobile-menu-buttons">
+            <button class="login-btn" onclick="location.href='login.html'">Login</button>
+            <button class="signup-btn" onclick="location.href='signup.html'">Sign Up</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+
+            <div class="settings-container">
+                <div class="settings-alert success" id="settingsSaved">
+                    <i class="material-icons">check_circle</i> Settings saved successfully!
+                </div>
+                
+                <!-- Appearance Settings -->
+                <div class="settings-section">
+                    <h2><i class="material-icons">palette</i> Appearance</h2>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Theme</h3>
+                            <p>Choose your preferred visual style</p>
+                            
+                            <div class="theme-options">
+                                <div class="theme-option" data-theme="light">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">light_mode</i>
+                                    </div>
+                                    <div class="theme-preview"></div>
+                                    <div class="theme-name">Light</div>
+                                </div>
+                                <div class="theme-option" data-theme="dark">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">dark_mode</i>
+                                    </div>
+                                    <div class="theme-preview"></div>
+                                    <div class="theme-name">Dark</div>
+                                </div>
+                                <div class="theme-option" data-theme="auto">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">auto_mode</i>
+                                    </div>
+                                    <div class="theme-preview"></div>
+                                    <div class="theme-name">System</div>
+                                </div>
+                            </div>
+                            
+                            <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 0.95rem;">Special Themes</h4>
+                            <div class="theme-options special-themes">
+                                <div class="theme-option" data-theme="theme-philosophical">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">menu_book</i>
+                                    </div>
+                                    <div class="theme-preview" style="background-color: #f9f6f0; color: #8b5a2b;"></div>
+                                    <div class="theme-name">Philosophical</div>
+                                </div>
+                                <div class="theme-option" data-theme="theme-science">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">science</i>
+                                    </div>
+                                    <div class="theme-preview" style="background-color: #f3f7fc; color: #0f62fe;"></div>
+                                    <div class="theme-name">Science</div>
+                                </div>
+                                <div class="theme-option" data-theme="theme-nature">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">eco</i>
+                                    </div>
+                                    <div class="theme-preview" style="background-color: #f1f8e9; color: #2e7d32;"></div>
+                                    <div class="theme-name">Nature</div>
+                                </div>
+                                <div class="theme-option" data-theme="theme-cyberpunk">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">flash_on</i>
+                                    </div>
+                                    <div class="theme-preview" style="background-color: #0b0b19; color: #ff0055;"></div>
+                                    <div class="theme-name">Cyberpunk</div>
+                                </div>
+                                <div class="theme-option" data-theme="theme-minimal">
+                                    <div class="theme-icon">
+                                        <i class="material-icons">tab</i>
+                                    </div>
+                                    <div class="theme-preview" style="background-color: #ffffff; color: #000000; border: 1px solid #e0e0e0;"></div>
+                                    <div class="theme-name">Minimal</div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Dark Mode</h3>
+                            <p>Enable dark mode for any theme</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Font Family</h3>
+                            <p>Choose your preferred font for better readability</p>
+                            
+                            <div class="font-options">
+                                <div class="font-option" data-font="Poppins">
+                                    <div class="font-preview" style="font-family: 'Poppins', sans-serif;">Aa</div>
+                                    <div class="font-name">Poppins</div>
+                                </div>
+                                <div class="font-option" data-font="Roboto">
+                                    <div class="font-preview" style="font-family: 'Roboto', sans-serif;">Aa</div>
+                                    <div class="font-name">Roboto</div>
+                                </div>
+                                <div class="font-option" data-font="Open Sans">
+                                    <div class="font-preview" style="font-family: 'Open Sans', sans-serif;">Aa</div>
+                                    <div class="font-name">Open Sans</div>
+                                </div>
+                                <div class="font-option" data-font="Lato">
+                                    <div class="font-preview" style="font-family: 'Lato', sans-serif;">Aa</div>
+                                    <div class="font-name">Lato</div>
+                                </div>
+                                <div class="font-option" data-font="Montserrat">
+                                    <div class="font-preview" style="font-family: 'Montserrat', sans-serif;">Aa</div>
+                                    <div class="font-name">Montserrat</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Font Size</h3>
+                            <p>Adjust the text size for better readability</p>
+                            
+                            <div class="font-size-options">
+                                <span class="font-size-label">Small</span>
+                                <input type="range" min="14" max="20" value="16" class="font-size-slider" id="fontSizeSlider">
+                                <span class="font-size-value" id="fontSizeValue">16px</span>
+                                <span class="font-size-label">Large</span>
+                            </div>
+                            <div class="font-size-sample" id="fontSizeSample">
+                                This is a sample text. Adjust the slider to see how font size changes.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Reduce Animations</h3>
+                            <p>Minimize animations throughout the site</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="reduceAnimations">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Notification Settings -->
+                <div class="settings-section">
+                    <h2><i class="material-icons">notifications</i> Notifications</h2>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Email Notifications</h3>
+                            <p>Receive notifications about replies, likes, and mentions via email</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="emailNotifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Push Notifications</h3>
+                            <p>Allow browser notifications for real-time updates</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="pushNotifications">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Notification Sound</h3>
+                            <p>Play a sound when you receive a notification</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="notificationSound" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Privacy Settings -->
+                <div class="settings-section">
+                    <h2><i class="material-icons">shield</i> Privacy</h2>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Public Profile</h3>
+                            <p>Allow others to view your profile and contributions</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="publicProfile" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Show Online Status</h3>
+                            <p>Let others see when you're online</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="onlineStatus">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="settings-option">
+                        <div class="option-info">
+                            <h3>Data Collection</h3>
+                            <p>Allow Storm Write to collect usage data to improve the service</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="dataCollection" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Save Button -->
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <button class="settings-button primary" id="saveSettings">
+                        <i class="material-icons" style="font-size: 1.2rem; vertical-align: middle; margin-right: 0.5rem;">save</i> Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h2>Storm Write</h2>
+                    <p>A community for meaningful conversations</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-links-column">
+                        <h3>Navigate</h3>
+                        <ul>
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="topics.html">Topics</a></li>
+                            <li><a href="notifications.html">Notifications</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>Support</h3>
+                        <ul>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="contact.html">Contact Us</a></li>
+                            <li><a href="privacy.html">Privacy Policy</a></li>
+                            <li><a href="terms.html">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-links-column">
+                        <h3>About</h3>
+                        <ul>
+                            <li><a href="about.html">Our Story</a></li>
+                            <li><a href="profile.html">Profile</a></li>
+                            <li><a href="write.html">Write</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Storm Write. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize DOM elements first
+            const themeOptions = document.querySelectorAll('.theme-option');
+            const fontOptions = document.querySelectorAll('.font-option');
+            const fontSizeSlider = document.getElementById('fontSizeSlider');
+            const fontSizeValue = document.getElementById('fontSizeValue');
+            const fontSizeSample = document.getElementById('fontSizeSample');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            
+            // Function to apply font family
+            function applyFontFamily(font) {
+                document.documentElement.style.setProperty('--font-family', `'${font}', sans-serif`);
+                if (fontSizeSample) {
+                    fontSizeSample.style.fontFamily = `'${font}', sans-serif`;
+                }
+            }
+            
+            // Function to apply font size
+            function applyFontSize(size) {
+                document.documentElement.style.setProperty('--base-font-size', `${size}px`);
+            }
+            
+            // Function to apply theme
+            function applyTheme(theme) {
+                // Remove all theme classes
+                document.body.classList.remove('theme-philosophical', 'theme-science', 'theme-nature', 'theme-cyberpunk', 'theme-minimal');
+                
+                // If it's a special theme, add the class
+                if (theme.startsWith('theme-')) {
+                    document.body.classList.add(theme);
+                }
+            }
+            
+            // Function to apply dark mode
+            function applyDarkMode(isDark) {
+                if (isDark) {
+                    document.body.classList.add('dark-mode');
+                    document.querySelector('.header').classList.add('dark-mode');
+                    document.querySelector('.mobile-menu').classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.querySelector('.header').classList.remove('dark-mode');
+                    document.querySelector('.mobile-menu').classList.remove('dark-mode');
+                }
+            }
+            
+            // Initialize theme selection
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            
+            // Apply saved theme
+            themeOptions.forEach(option => {
+                if (option.dataset.theme === savedTheme) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // Apply theme
+            applyTheme(savedTheme);
+            
+            // Initialize dark mode
+            const darkModeEnabled = localStorage.getItem('darkMode') === 'enabled' || 
+                                    (savedTheme === 'dark') || 
+                                    (savedTheme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            
+            // Set dark mode toggle state
+            darkModeToggle.checked = darkModeEnabled;
+            
+            // Apply dark mode
+            applyDarkMode(darkModeEnabled);
+            
+            // Font options initialization
+            const savedFont = localStorage.getItem('fontFamily') || 'Poppins';
+            
+            // Apply saved font
+            fontOptions.forEach(option => {
+                if (option.dataset.font === savedFont) {
+                    option.classList.add('active');
+                }
+            });
+            applyFontFamily(savedFont);
+            
+            // Font size initialization
+            const savedFontSize = localStorage.getItem('fontSize') || '16';
+            
+            fontSizeSlider.value = savedFontSize;
+            fontSizeValue.textContent = savedFontSize + 'px';
+            fontSizeSample.style.fontSize = savedFontSize + 'px';
+            applyFontSize(savedFontSize);
+            
+            // Dark mode toggle
+            darkModeToggle.addEventListener('change', () => {
+                applyDarkMode(darkModeToggle.checked);
+            });
+            
+            // Theme selection
+            themeOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active class from all options
+                    themeOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    option.classList.add('active');
+                    
+                    // Get selected theme
+                    const theme = option.dataset.theme;
+                    
+                    // Apply theme
+                    applyTheme(theme);
+                    
+                    // Apply dark mode based on toggle for special themes,
+                    // or based on theme selection for light/dark/auto
+                    if (theme.startsWith('theme-')) {
+                        applyDarkMode(darkModeToggle.checked);
+                    } else if (theme === 'dark') {
+                        darkModeToggle.checked = true;
+                        applyDarkMode(true);
+                    } else if (theme === 'light') {
+                        darkModeToggle.checked = false;
+                        applyDarkMode(false);
+                    } else if (theme === 'auto') {
+                        const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                        darkModeToggle.checked = systemDarkMode;
+                        applyDarkMode(systemDarkMode);
+                    }
+                });
+            });
+            
+            // Font family selection
+            fontOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active class from all options
+                    fontOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    option.classList.add('active');
+                    
+                    // Apply font
+                    const font = option.dataset.font;
+                    applyFontFamily(font);
+                });
+            });
+            
+            // Font size slider
+            fontSizeSlider.addEventListener('input', () => {
+                const fontSize = fontSizeSlider.value;
+                fontSizeValue.textContent = fontSize + 'px';
+                fontSizeSample.style.fontSize = fontSize + 'px';
+            });
+            
+            // Get other settings from localStorage
+            document.getElementById('reduceAnimations').checked = localStorage.getItem('reduceAnimations') === 'true';
+            document.getElementById('emailNotifications').checked = localStorage.getItem('emailNotifications') !== 'false';
+            document.getElementById('pushNotifications').checked = localStorage.getItem('pushNotifications') === 'true';
+            document.getElementById('notificationSound').checked = localStorage.getItem('notificationSound') !== 'false';
+            document.getElementById('publicProfile').checked = localStorage.getItem('publicProfile') !== 'false';
+            document.getElementById('onlineStatus').checked = localStorage.getItem('onlineStatus') === 'true';
+            document.getElementById('dataCollection').checked = localStorage.getItem('dataCollection') !== 'false';
+            
+            // Apply reduce animations if saved
+            if (localStorage.getItem('reduceAnimations') === 'true') {
+                document.documentElement.classList.add('reduce-animations');
+            }
+            
+            // Save settings
+            document.getElementById('saveSettings').addEventListener('click', () => {
+                // Save theme
+                let selectedTheme = 'light';
+                themeOptions.forEach(option => {
+                    if (option.classList.contains('active')) {
+                        selectedTheme = option.dataset.theme;
+                    }
+                });
+                localStorage.setItem('theme', selectedTheme);
+                
+                // Save dark mode state
+                const isDarkMode = darkModeToggle.checked;
+                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+                
+                // Save font family
+                let selectedFont = 'Poppins';
+                fontOptions.forEach(option => {
+                    if (option.classList.contains('active')) {
+                        selectedFont = option.dataset.font;
+                    }
+                });
+                localStorage.setItem('fontFamily', selectedFont);
+                
+                // Save font size
+                const fontSize = fontSizeSlider.value;
+                localStorage.setItem('fontSize', fontSize);
+                
+                // Save other settings
+                const reduceAnimations = document.getElementById('reduceAnimations').checked;
+                localStorage.setItem('reduceAnimations', reduceAnimations);
+                localStorage.setItem('emailNotifications', document.getElementById('emailNotifications').checked);
+                localStorage.setItem('pushNotifications', document.getElementById('pushNotifications').checked);
+                localStorage.setItem('notificationSound', document.getElementById('notificationSound').checked);
+                localStorage.setItem('publicProfile', document.getElementById('publicProfile').checked);
+                localStorage.setItem('onlineStatus', document.getElementById('onlineStatus').checked);
+                localStorage.setItem('dataCollection', document.getElementById('dataCollection').checked);
+                
+                // Apply settings immediately
+                applyTheme(selectedTheme);
+                applyDarkMode(isDarkMode);
+                applyFontFamily(selectedFont);
+                applyFontSize(fontSize);
+                
+                // Apply reduce animations immediately
+                if (reduceAnimations) {
+                    document.documentElement.classList.add('reduce-animations');
+                } else {
+                    document.documentElement.classList.remove('reduce-animations');
+                }
+                
+                // Show success message
+                const alert = document.getElementById('settingsSaved');
+                alert.style.display = 'block';
+                
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            });
+            
+            // Listen for system theme changes if auto is selected
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+                const savedTheme = localStorage.getItem('theme') || 'light';
+                
+                if (savedTheme === 'auto') {
+                    const systemDarkMode = event.matches;
+                    darkModeToggle.checked = systemDarkMode;
+                    applyDarkMode(systemDarkMode);
+                    localStorage.setItem('darkMode', systemDarkMode ? 'enabled' : 'disabled');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification - Storm Write</title>
+    <!-- Google Fonts - Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Font Awesome for remaining icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        /* Remove animations and transitions */
+        *, *::before, *::after {
+            transition: none !important;
+            animation: none !important;
+        }
+
+        body {
+            background-color: var(--body-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .logo-small {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        .logo-small a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .verification-container {
+            max-width: 500px;
+            width: 90%;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .verification-icon {
+            font-size: 60px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .verification-title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .verification-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .verification-email {
+            font-weight: 500;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        .verification-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .verification-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 400;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .primary-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .primary-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .secondary-button {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .secondary-button:hover {
+            background-color: rgba(var(--primary-rgb), 0.05);
+        }
+
+        .verification-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .verification-tips {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: rgba(var(--primary-rgb), 0.05);
+            border-radius: 4px;
+            text-align: left;
+            font-size: 13px;
+        }
+        
+        .verification-tips h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        
+        .verification-tips ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .verification-tips li {
+            margin-bottom: 4px;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-right: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+        }
+    </style>
+    <script type="module" src="js/navbar.js"></script>
+</head>
+<body>
+    <div class="verification-container">
+        <div class="logo-small">
+            <a href="index.html">Storm Write</a>
+        </div>
+        
+        <div class="verification-icon">
+            <i class="fas fa-envelope"></i>
+        </div>
+        
+        <h1 id="verification-title" class="verification-title">Email Verification</h1>
+        
+        <p id="verification-message" class="verification-message">
+            We've sent a verification email to <span id="verification-email" class="verification-email"></span>.
+            Please check your inbox and click the verification link to activate your account.
+        </p>
+        
+        <div class="verification-actions">
+            <button onclick="window.location.href='index.html'" id="action-button" class="verification-button primary-button">Go to Home</button>
+            <button id="resend-button" class="verification-button secondary-button">Resend Verification Email</button>
+            <button id="login-button" class="verification-button secondary-button" style="display: none;">Back to Login</button>
+        </div>
+        
+        <div class="verification-tips">
+            <h3>Can't find the email?</h3>
+            <ul>
+                <li>Check your spam or junk folder</li>
+                <li>Make sure your email address was entered correctly</li>
+                <li>Allow emails from noreply@firebase.com</li>
+                <li>Wait a few minutes for the email to arrive</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- App Scripts -->
+    <script src="js/firebase-config.js"></script>
+    <script type="module" src="js/verification.js"></script>
+</body>
+</html> 
